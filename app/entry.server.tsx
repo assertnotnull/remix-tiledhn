@@ -1,9 +1,10 @@
-import { PassThrough } from "stream";
 import type { EntryContext } from "@remix-run/node";
 import { Response } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
+import { PassThrough } from "stream";
+import { version } from "process";
 
 const ABORT_DELAY = 5000;
 
@@ -13,6 +14,7 @@ export default function handleRequest(
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
+  console.log(`From entry.server.tsx - Node is ${version}`);
   const callbackName = isbot(request.headers.get("user-agent"))
     ? "onAllReady"
     : "onShellReady";

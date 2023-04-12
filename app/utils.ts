@@ -1,4 +1,8 @@
 import { useMatches } from "@remix-run/react";
+import type { IO } from "fp-ts/lib/IO";
+import type { Option } from "fp-ts/lib/Option";
+import { fromNullable } from "fp-ts/lib/Option";
+import { curry, Maybe } from "purify-ts";
 import { useMemo } from "react";
 
 import type { User } from "~/models/user.server";
@@ -69,3 +73,23 @@ export function useUser(): User {
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
+
+const withWindow = <returnValue>(fn: () => returnValue) =>
+  typeof window !== "undefined" ? fn() : undefined;
+
+export const getStorageItem = (key: string) =>
+  withWindow<string | null>(() => {
+    console.log(`get from storage ${key}`);
+    return window.localStorage.getItem(key);
+  });
+
+export const setStorageItem = curry((key: string, value: string) => {
+  // console.log("here");
+  if (typeof window !== "undefined") {
+    console.log("we have window");
+  }
+  return withWindow<void>(() => {
+    console.log(`saving to storage ${key}`);
+    window.localStorage.setItem(key, value);
+  });
+});
