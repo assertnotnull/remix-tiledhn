@@ -34,7 +34,7 @@ export function Grid({ stories }: { stories: Story[] }) {
                   {story.score} - {story.time}
                 </p>
 
-                <a className="btn btn-primary" href={story.url}>
+                <a className="btn btn-primary" href={story.url} target="_blank">
                   Source
                 </a>
                 <Link to={`/story/${story.id}`} className="btn btn-ghost">

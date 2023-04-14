@@ -1,8 +1,5 @@
 import { useMatches } from "@remix-run/react";
-import type { IO } from "fp-ts/lib/IO";
-import type { Option } from "fp-ts/lib/Option";
-import { fromNullable } from "fp-ts/lib/Option";
-import { curry, Maybe } from "purify-ts";
+import { curry } from "purify-ts/Function";
 import { useMemo } from "react";
 
 import type { User } from "~/models/user.server";
