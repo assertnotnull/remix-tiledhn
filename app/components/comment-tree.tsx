@@ -1,6 +1,6 @@
-import type { CommentLeaf } from "~/models/item.server";
+import type { Comment } from "~/models/item.server";
 
-export default function CommentTree({ comments }: { comments: CommentLeaf[] }) {
+export default function CommentTree({ comments }: { comments: Comment[] }) {
   return (
     <ul>
       {comments && comments.length
@@ -14,12 +14,14 @@ export default function CommentTree({ comments }: { comments: CommentLeaf[] }) {
                 <h4 className="text-gray-800 font-semibold text-xl mb-1.5">
                   {comment.by}
                 </h4>
-                <p
-                  className="text-gray-500 mb-3"
-                  dangerouslySetInnerHTML={{
-                    __html: comment.text,
-                  }}
-                ></p>
+                {comment.text && (
+                  <p
+                    className="text-gray-500 mb-3"
+                    dangerouslySetInnerHTML={{
+                      __html: comment.text,
+                    }}
+                  ></p>
+                )}
                 <ul>
                   <CommentTree comments={comment.comments} />
                 </ul>

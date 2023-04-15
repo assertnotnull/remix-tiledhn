@@ -5,38 +5,21 @@ import {
   useTransition,
 } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
-import * as R from "ramda";
 import CommentTree from "~/components/comment-tree";
-import type { CommentLeaf, Story } from "~/models/item.server";
-import { getCommentLeaf, getItem } from "~/models/item.server";
+import type { Comment, Story } from "~/models/item.server";
+import { storySchema } from "~/models/item.server";
+import { commentTreeSchema, getComment, getItem } from "~/models/item.server";
 import NavBar from "../nav";
 
 export async function loader({ params }: { params: { storyId: string } }) {
   const story = await getItem<Story>(params.storyId);
-  return json(story);
+
+  return json(storySchema.parse(story));
 }
 
 type ActionData = {
-  comments: CommentLeaf[];
+  comments: Comment[];
 };
-
-const formatOptions: Intl.DateTimeFormatOptions = {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-  hour: "numeric",
-  minute: "numeric",
-  second: "numeric",
-  hour12: false,
-};
-
-const convertTimeToDate = ({ time }: { time: number }) => new Date(time * 1000);
-const convertDateToIntlFormat = (date: Date) =>
-  new Intl.DateTimeFormat("en-US", formatOptions).format(date);
-const convertTimePipeline = <T extends { time: number }>(item: T) =>
-  R.pipe(convertTimeToDate, convertDateToIntlFormat, (datestring) =>
-    R.assoc("time", datestring, item)
-  )(item);
 
 export async function action({ request }: { request: Request }) {
   const body = await request.formData();
@@ -44,10 +27,12 @@ export async function action({ request }: { request: Request }) {
   if (intent === "loadComment") {
     const kids: string = (body.get("kids") as string) || "";
     const comments = await Promise.all(
-      kids.split(",").map((id) => getCommentLeaf(id))
+      kids.split(",").map((id) => getComment(parseInt(id)))
     );
 
-    return json({ comments: comments.map(convertTimePipeline) });
+    return json({
+      comments: comments.map((comment) => commentTreeSchema.parse(comment)),
+    });
   }
   return json({});
 }
@@ -71,8 +56,7 @@ export default function Index() {
                 <div className="card-body">
                   <h2 className="card-title">{story.title}</h2>
                   <p>
-                    {story.score} -{" "}
-                    {new Date(story.time * 1000).toLocaleString()}
+                    {story.score} - {story.time}
                   </p>
                   <a className="btn btn-primary" href={story.url}>
                     Source
@@ -87,7 +71,13 @@ export default function Index() {
                       ? "loading comments.."
                       : `${story.descendants} Comments`}
                   </button>
-                  <input type="hidden" name="kids" value={story.kids} />
+                  {story.kids && (
+                    <input
+                      type="hidden"
+                      name="kids"
+                      value={story.kids.toString()}
+                    />
+                  )}
                   <ul>
                     <CommentTree comments={data?.comments ?? []} />
                   </ul>
