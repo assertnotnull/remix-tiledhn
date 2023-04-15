@@ -1,5 +1,5 @@
-import { D } from "@mobily/ts-belt";
-import { pipe } from "rambda";
+import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
+import { D, flow } from "@mobily/ts-belt";
 import { z } from "zod";
 
 const formatOptions: Intl.DateTimeFormatOptions = {
@@ -21,7 +21,7 @@ const itemSchema = z.object({
   id: z.number(),
   type: z.enum(["job", "story", "comment", "poll", "pollopt"]),
   by: z.string().optional(),
-  time: z.number().transform(pipe(convertTimeToDate, convertDateToIntlFormat)),
+  time: z.number().transform(flow(convertTimeToDate, convertDateToIntlFormat)),
   text: z.string().optional(),
 });
 
@@ -107,9 +107,15 @@ export function getItem<T>(id: string) {
 export async function getComment(id: number) {
   const comment = await callAPI<Comment>(`${itemPath}/${id}.json`);
   const leaf = toCommentLeaf(comment);
-  leaf.comments = await Promise.all(
-    leaf.kids?.map((kid) => getComment(kid)) ?? []
-  );
+  leaf.comments = leaf.kids
+    ? await pipe(
+        leaf.kids,
+        toAsync,
+        map((kid) => getComment(kid)),
+        concurrent(20),
+        toArray
+      )
+    : [];
   return leaf;
 }
 
