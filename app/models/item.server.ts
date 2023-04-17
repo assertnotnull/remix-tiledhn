@@ -1,5 +1,5 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
-import { D, flow } from "@mobily/ts-belt";
+import { flow } from "@mobily/ts-belt";
 import { z } from "zod";
 
 const formatOptions: Intl.DateTimeFormatOptions = {
@@ -12,6 +12,8 @@ const formatOptions: Intl.DateTimeFormatOptions = {
   hour12: false,
 };
 
+const storyIdsSchema = z.array(z.number());
+
 const convertTimeToDate = (time: number) => new Date(time * 1000);
 const convertDateToIntlFormat = (date: Date) =>
   new Intl.DateTimeFormat("en-US", formatOptions).format(date);
@@ -21,7 +23,14 @@ const itemSchema = z.object({
   id: z.number(),
   type: z.enum(["job", "story", "comment", "poll", "pollopt"]),
   by: z.string().optional(),
-  time: z.number().transform(flow(convertTimeToDate, convertDateToIntlFormat)),
+  time: z
+    .number()
+    .or(z.string())
+    .transform((val) =>
+      typeof val === "number"
+        ? flow(convertTimeToDate, convertDateToIntlFormat)(val)
+        : val
+    ),
   text: z.string().optional(),
 });
 
@@ -30,7 +39,7 @@ export type Item = z.infer<typeof itemSchema>;
 export const commentSchema = itemSchema.extend({
   type: z.literal("comment"),
   parent: z.number(),
-  kids: z.array(z.number()).optional(),
+  kids: z.array(z.number()).default([]),
 });
 
 export type Comment = z.infer<typeof commentSchema> & {
@@ -39,14 +48,14 @@ export type Comment = z.infer<typeof commentSchema> & {
 
 //@ts-ignore zod can't reassign time number to string
 export const commentTreeSchema: z.ZodType<Comment> = commentSchema.extend({
-  comments: z.lazy(() => commentTreeSchema.array()),
+  comments: z.lazy(() => commentTreeSchema.array().default([])),
 });
 
 const titleUrlSchema = itemSchema.extend({
   title: z.string(),
-  url: z.string(),
+  url: z.string().nullable(),
   score: z.number(),
-  kids: z.array(z.number()).nullable(),
+  kids: z.array(z.number()).default([]),
   descendants: z.number(),
 });
 
@@ -82,55 +91,53 @@ export type PollOpt = z.infer<typeof pollOptSchema>;
 const root = "https://hacker-news.firebaseio.com/v0/";
 const itemPath = `${root}/item`;
 
-const callAPI = async <T>(url: string): Promise<T> => {
+const callAPI = async (url: string) => {
   const res = await fetch(url);
   return res.json();
 };
 
-export async function getStories(
+export async function getStoryIdsBySection(
   section: "top" | "job" | "ask" | "show",
   qty: number = 20
-) {
+): Promise<number[]> {
   const url = `${root}/${section}stories.json`;
-  const stories = await callAPI<string[]>(url);
-  return stories.slice(0, qty);
+  return pipe(callAPI(url), storyIdsSchema.parse, (stories) =>
+    stories.slice(0, qty)
+  );
 }
 
 export function getTopStories(qty: number = -1) {
-  return getStories("top", qty);
+  return getStoryIdsBySection("top", qty);
 }
 
-export function getItem<T>(id: string) {
-  return callAPI<T>(`${itemPath}/${id}.json`);
+export function getItem(id: number) {
+  return callAPI(`${itemPath}/${id}.json`);
 }
 
 export async function getComment(id: number) {
-  const comment = await callAPI<Comment>(`${itemPath}/${id}.json`);
-  const leaf = toCommentLeaf(comment);
-  leaf.comments = leaf.kids
-    ? await pipe(
-        leaf.kids,
-        toAsync,
-        map((kid) => getComment(kid)),
-        concurrent(20),
-        toArray
-      )
-    : [];
-  return leaf;
-}
+  const comment = await pipe(
+    callAPI(`${itemPath}/${id}.json`),
+    commentTreeSchema.parse
+  );
 
-function toCommentLeaf(comment: Comment): Comment {
-  return D.set(structuredClone(comment), "comments", []);
+  comment.comments = await pipe(
+    comment.kids,
+    toAsync,
+    map((kid) => getComment(kid)),
+    concurrent(20),
+    toArray
+  );
+  return comment;
 }
 
 export async function getJobStories(qty: number) {
-  return getStories("job", qty);
+  return getStoryIdsBySection("job", qty);
 }
 
 export async function getAskStories(qty: number) {
-  return getStories("ask", qty);
+  return getStoryIdsBySection("ask", qty);
 }
 
 export async function getShowStories(qty: number) {
-  return getStories("show", qty);
+  return getStoryIdsBySection("show", qty);
 }

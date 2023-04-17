@@ -10,9 +10,10 @@ import type { Comment, Story } from "~/models/item.server";
 import { storySchema } from "~/models/item.server";
 import { commentTreeSchema, getComment, getItem } from "~/models/item.server";
 import NavBar from "../nav";
+import { map, pipe, tap, toArray, toAsync } from "@fxts/core";
 
-export async function loader({ params }: { params: { storyId: string } }) {
-  const story = await getItem<Story>(params.storyId);
+export async function loader({ params }: { params: { storyId: number } }) {
+  const story = await getItem(params.storyId);
 
   return json(storySchema.parse(story));
 }
@@ -26,8 +27,11 @@ export async function action({ request }: { request: Request }) {
   const intent = body.get("intent");
   if (intent === "loadComment") {
     const kids: string = (body.get("kids") as string) || "";
-    const comments = await Promise.all(
-      kids.split(",").map((id) => getComment(parseInt(id)))
+    const comments = await pipe(
+      kids.split(","),
+      toAsync,
+      map((id) => getComment(parseInt(id))),
+      toArray
     );
 
     return json({
