@@ -1,20 +1,24 @@
+import { map, pipe, toArray, toAsync } from "@fxts/core";
 import {
   Form,
   useActionData,
   useLoaderData,
-  useTransition,
+  useNavigation,
 } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import CommentTree from "~/components/comment-tree";
-import type { Comment, Story } from "~/models/item.server";
-import { storySchema } from "~/models/item.server";
-import { commentTreeSchema, getComment, getItem } from "~/models/item.server";
+import type { Comment } from "~/models/item.server";
+import {
+  commentTreeSchema,
+  getComment,
+  getItem,
+  storySchema,
+} from "~/models/item.server";
+import { redisclient } from "~/redis.server";
 import NavBar from "../nav";
-import { map, pipe, tap, toArray, toAsync } from "@fxts/core";
 
 export async function loader({ params }: { params: { storyId: number } }) {
   const story = await getItem(params.storyId);
-
   return json(storySchema.parse(story));
 }
 
@@ -25,7 +29,12 @@ type ActionData = {
 export async function action({ request }: { request: Request }) {
   const body = await request.formData();
   const intent = body.get("intent");
+  const storyId = body.get("storyId");
   if (intent === "loadComment") {
+    const cachedComments = await redisclient.get(`comments:${storyId}`);
+    if (cachedComments) {
+      return json({ comments: JSON.parse(cachedComments) });
+    }
     const kids: string = (body.get("kids") as string) || "";
     const comments = await pipe(
       kids.split(","),
@@ -33,26 +42,26 @@ export async function action({ request }: { request: Request }) {
       map((id) => getComment(parseInt(id))),
       toArray
     );
-
+    redisclient.setex(`comments:${storyId}`, 10 * 60, JSON.stringify(comments));
     return json({
       comments: comments.map((comment) => commentTreeSchema.parse(comment)),
     });
   }
-  return json({});
+  return json({ comments: [] });
 }
 
 export default function Index() {
-  const story = useLoaderData<Story>();
+  const story = useLoaderData<typeof loader>();
   const data = useActionData<ActionData>();
 
-  const transition = useTransition();
-  const isLoading = transition.state === "loading";
-  const isLoadingComments = transition.submission;
+  const transition = useNavigation();
+  const isLoadingComments = transition.state === "submitting";
 
   return (
     <main>
       <NavBar />
       <Form method="post">
+        <input type="hidden" name="storyId" value={story.id} />
         <section className="bg-white dark:bg-gray-900">
           <div className="px-6 py-10 mx-auto">
             <div className="grid grid-cols-1 gap-4">
@@ -62,14 +71,20 @@ export default function Index() {
                   <p>
                     {story.score} - {story.time}
                   </p>
-                  <a className="btn btn-primary" href={story.url}>
-                    Source
-                  </a>
+                  {story.url ? (
+                    <a className="btn btn-primary" href={story.url}>
+                      Source
+                    </a>
+                  ) : null}
                   <button
                     type="submit"
                     name="intent"
                     value="loadComment"
                     className="btn btn-ghost"
+                    disabled={
+                      isLoadingComments ||
+                      (data?.comments && data?.comments.length > 0)
+                    }
                   >
                     {isLoadingComments
                       ? "loading comments.."

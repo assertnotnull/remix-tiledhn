@@ -1,22 +1,41 @@
-import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
-import type { Story } from "~/models/item.server";
-import { getShowStories, getItem } from "~/models/item.server";
+import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
+import { Await, useLoaderData } from "@remix-run/react";
+import { defer } from "@remix-run/server-runtime";
+import { Suspense } from "react";
+import { getItem, getShowStories } from "~/models/item.server";
+import { redisclient } from "~/redis.server";
 import { Grid } from "./grid";
 import NavBar from "./nav";
 
 export async function loader() {
+  const cached = await redisclient.get("show");
+  if (cached) {
+    return defer({ stories: JSON.parse(cached) });
+  }
+
   const storyIds = await getShowStories(20);
-  const stories = await Promise.all(storyIds.map((id) => getItem(id)));
-  return json(stories);
+  const stories = await pipe(
+    storyIds,
+    toAsync,
+    map((id) => getItem(id)),
+    concurrent(10),
+    toArray
+  );
+  redisclient.setex("show", 15 * 60, JSON.stringify(stories));
+
+  return defer({ stories });
 }
 
 export default function Index() {
-  const stories = useLoaderData<Story[]>();
+  const data = useLoaderData<typeof loader>();
   return (
     <main>
       <NavBar />
-      <Grid stories={stories} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
+          {(stories) => <Grid stories={stories} />}
+        </Await>
+      </Suspense>
     </main>
   );
 }

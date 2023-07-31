@@ -53,7 +53,7 @@ export const commentTreeSchema: z.ZodType<Comment> = commentSchema.extend({
 
 const titleUrlSchema = itemSchema.extend({
   title: z.string(),
-  url: z.string().nullable(),
+  url: z.string().nullable().optional(),
   score: z.number(),
   kids: z.array(z.number()).default([]),
   descendants: z.number(),

@@ -5,6 +5,7 @@ import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import { PassThrough } from "stream";
 import { version } from "process";
+import { z } from "zod";
 
 const ABORT_DELAY = 5000;
 
