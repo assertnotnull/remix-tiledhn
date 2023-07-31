@@ -1,5 +1,7 @@
 # Tiled Hacker news on Remix
 
+![Screenshot of the UI](./screenshot.png)
+
 Install intructions:
 
 ```
