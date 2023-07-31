@@ -7,6 +7,14 @@ pnpm i
 pnpm dev
 ```
 
+## Description
+
+It uses [FxTS](https://fxts.dev/) to concurrently get news (ex: 10 concurrent requests).
+
+[Zod](https://zod.dev) is used to validate the structure of the data returned by the API. It also recursively parse comments.
+
+News/stories/comments are cached in Redis.
+
 # Remix Indie Stack
 
 ![The Remix Indie Stack](https://repository-images.githubusercontent.com/465928257/a241fa49-bd4d-485a-a2a5-5cb8e4ee0abf)
