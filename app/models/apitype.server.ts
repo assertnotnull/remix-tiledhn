@@ -1,5 +1,4 @@
-import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
-import { flow } from "@mobily/ts-belt";
+import { pipe } from "@fxts/core";
 import { z } from "zod";
 
 const formatOptions: Intl.DateTimeFormatOptions = {
@@ -12,13 +11,12 @@ const formatOptions: Intl.DateTimeFormatOptions = {
   hour12: false,
 };
 
-const storyIdsSchema = z.array(z.number());
-
 const convertTimeToDate = (time: number) => new Date(time * 1000);
 const convertDateToIntlFormat = (date: Date) =>
   new Intl.DateTimeFormat("en-US", formatOptions).format(date);
 
 export type ItemType = "job" | "story" | "comment" | "poll" | "pollopt";
+
 const itemSchema = z.object({
   id: z.number(),
   type: z.enum(["job", "story", "comment", "poll", "pollopt"]),
@@ -28,7 +26,7 @@ const itemSchema = z.object({
     .or(z.string())
     .transform((val) =>
       typeof val === "number"
-        ? flow(convertTimeToDate, convertDateToIntlFormat)(val)
+        ? pipe(val, convertTimeToDate, convertDateToIntlFormat)
         : val
     ),
   text: z.string().optional(),
@@ -60,7 +58,7 @@ const titleUrlSchema = itemSchema.extend({
 });
 
 export const storySchema = titleUrlSchema.extend({
-  type: z.enum(["story", "job", "poll", "pollopt"]),
+  type: z.enum(["story", "job"]),
   text: z.string().optional(),
 });
 
@@ -89,56 +87,4 @@ const pollOptSchema = itemSchema.extend({
 
 export type PollOpt = z.infer<typeof pollOptSchema>;
 
-const root = "https://hacker-news.firebaseio.com/v0/";
-const itemPath = `${root}/item`;
-
-const callAPI = async (url: string) => {
-  const res = await fetch(url);
-  return res.json();
-};
-
-export async function getStoryIdsBySection(
-  section: "top" | "job" | "ask" | "show",
-  qty: number = 20
-): Promise<number[]> {
-  const url = `${root}/${section}stories.json`;
-  return pipe(callAPI(url), storyIdsSchema.parse, (stories) =>
-    stories.slice(0, qty)
-  );
-}
-
-export function getTopStories(qty: number = -1) {
-  return getStoryIdsBySection("top", qty);
-}
-
-export function getItem(id: number) {
-  return callAPI(`${itemPath}/${id}.json`);
-}
-
-export async function getComment(id: number) {
-  const comment = await pipe(
-    callAPI(`${itemPath}/${id}.json`),
-    commentTreeSchema.parse
-  );
-
-  comment.comments = await pipe(
-    comment.kids,
-    toAsync,
-    map((kid) => getComment(kid)),
-    concurrent(20),
-    toArray
-  );
-  return comment;
-}
-
-export async function getJobStories(qty: number) {
-  return getStoryIdsBySection("job", qty);
-}
-
-export async function getAskStories(qty: number) {
-  return getStoryIdsBySection("ask", qty);
-}
-
-export async function getShowStories(qty: number) {
-  return getStoryIdsBySection("show", qty);
-}
+export const storyIdsSchema = z.array(z.number());

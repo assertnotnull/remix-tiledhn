@@ -2,7 +2,7 @@ import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import { Await, useLoaderData } from "@remix-run/react";
 import { defer } from "@remix-run/server-runtime";
 import { Suspense } from "react";
-import { getItem, getTopStories } from "~/models/item.server";
+import { getItem, getTopStories } from "~/models/api.server";
 import { redisclient } from "~/redis.server";
 import { Grid } from "./grid";
 import NavBar from "./nav";

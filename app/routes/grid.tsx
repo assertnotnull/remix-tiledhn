@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import type { Story } from "~/models/item.server";
+import type { Story } from "~/models/apitype.server";
 
 export function Grid({ stories }: { stories: Story[] }) {
   return (

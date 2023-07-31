@@ -1,4 +1,4 @@
-import type { Comment } from "~/models/item.server";
+import type { Comment } from "~/models/apitype.server";
 
 export default function CommentTree({ comments }: { comments: Comment[] }) {
   return (

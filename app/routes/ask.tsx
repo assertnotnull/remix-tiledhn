@@ -2,7 +2,8 @@ import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import { Await, useLoaderData } from "@remix-run/react";
 import { defer } from "@remix-run/server-runtime";
 import { Suspense } from "react";
-import { getAskStories, getItem } from "~/models/item.server";
+import { getAskStories, getItem } from "~/models/api.server";
+import { storySchema } from "~/models/apitype.server";
 import { redisclient } from "~/redis.server";
 import { Grid } from "./grid";
 import NavBar from "./nav";
@@ -18,6 +19,7 @@ export async function loader() {
     storyIds,
     toAsync,
     map((id) => getItem(id)),
+    map((story) => storySchema.parse(story)),
     concurrent(10),
     toArray
   );
