@@ -8,7 +8,7 @@ import { Grid } from "./grid";
 import NavBar from "./nav";
 
 export async function loader() {
-  const cached = await redisclient.get("jobs");
+  const cached = await redisclient.get("index");
   if (cached) {
     return defer({ stories: JSON.parse(cached) });
   }
@@ -21,7 +21,7 @@ export async function loader() {
     concurrent(10),
     toArray
   );
-  redisclient.setex("jobs", 15 * 60, JSON.stringify(stories));
+  redisclient.setex("index", 15 * 60, JSON.stringify(stories));
 
   return defer({ stories });
 }

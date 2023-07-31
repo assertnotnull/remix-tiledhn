@@ -23,9 +23,13 @@ export function Grid({ stories }: { stories: Story[] }) {
                   >
                     Source
                   </a>
-                ) : null}
+                ) : (
+                  <button className="btn btn-ghost" disabled>
+                    No source
+                  </button>
+                )}
                 <Link to={`/story/${story.id}`} className="btn btn-ghost">
-                  {story.descendants} Comments
+                  Details - {story.descendants ?? "No"} Comments
                 </Link>
               </div>
             </div>

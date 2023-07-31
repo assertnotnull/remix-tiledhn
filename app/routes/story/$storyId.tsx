@@ -71,25 +71,37 @@ export default function Index() {
                   <p>
                     {story.score} - {story.time}
                   </p>
+                  {story.text ? (
+                    <div>
+                      <br />
+                      <p dangerouslySetInnerHTML={{ __html: story.text }}></p>
+                    </div>
+                  ) : null}
                   {story.url ? (
                     <a className="btn btn-primary" href={story.url}>
                       Source
                     </a>
                   ) : null}
-                  <button
-                    type="submit"
-                    name="intent"
-                    value="loadComment"
-                    className="btn btn-ghost"
-                    disabled={
-                      isLoadingComments ||
-                      (data?.comments && data?.comments.length > 0)
-                    }
-                  >
-                    {isLoadingComments
-                      ? "loading comments.."
-                      : `${story.descendants} Comments`}
-                  </button>
+                  {story.descendants ? (
+                    <button
+                      type="submit"
+                      name="intent"
+                      value="loadComment"
+                      className="btn btn-ghost"
+                      disabled={
+                        isLoadingComments ||
+                        (data?.comments && data?.comments.length > 0)
+                      }
+                    >
+                      {isLoadingComments
+                        ? "loading comments.."
+                        : `${story.descendants} Comments`}
+                    </button>
+                  ) : (
+                    <button className="btn btn-ghost" disabled>
+                      No comments
+                    </button>
+                  )}
                   {story.kids && (
                     <input
                       type="hidden"

@@ -56,11 +56,12 @@ const titleUrlSchema = itemSchema.extend({
   url: z.string().nullable().optional(),
   score: z.number(),
   kids: z.array(z.number()).default([]),
-  descendants: z.number(),
+  descendants: z.number().optional(),
 });
 
 export const storySchema = titleUrlSchema.extend({
-  type: z.literal("story"),
+  type: z.enum(["story", "job", "poll", "pollopt"]),
+  text: z.string().optional(),
 });
 
 export type Story = z.infer<typeof storySchema>;
