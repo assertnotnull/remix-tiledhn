@@ -1,5 +1,4 @@
 import { useMatches } from "@remix-run/react";
-import { curry } from "purify-ts/Function";
 import { useMemo } from "react";
 
 import type { User } from "~/models/user.server";
@@ -80,8 +79,7 @@ export const getStorageItem = (key: string) =>
     return window.localStorage.getItem(key);
   });
 
-export const setStorageItem = curry((key: string, value: string) => {
-  // console.log("here");
+export const setStorageItem = (key: string, value: string) => {
   if (typeof window !== "undefined") {
     console.log("we have window");
   }
@@ -89,4 +87,4 @@ export const setStorageItem = curry((key: string, value: string) => {
     console.log(`saving to storage ${key}`);
     window.localStorage.setItem(key, value);
   });
-});
+};
