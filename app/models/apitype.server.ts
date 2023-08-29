@@ -17,10 +17,10 @@ const convertDateToIntlFormat = (date: Date) =>
 
 export type ItemType = "job" | "story" | "comment" | "poll" | "pollopt";
 
-const itemSchema = z.object({
+export const itemSchema = z.object({
   id: z.number(),
   type: z.enum(["job", "story", "comment", "poll", "pollopt"]),
-  by: z.string().optional(),
+  by: z.string(),
   time: z
     .number()
     .or(z.string())
@@ -29,7 +29,13 @@ const itemSchema = z.object({
         ? pipe(val, convertTimeToDate, convertDateToIntlFormat)
         : val
     ),
+  title: z.string(),
   text: z.string().optional(),
+  score: z.number(),
+  url: z.string().nullable().optional(),
+  descendants: z.number().optional(), //only for stories or polls - number of comments
+  kids: z.array(z.number()).default([]), //comments
+  dead: z.boolean().optional(),
 });
 
 export type Item = z.infer<typeof itemSchema>;
@@ -48,27 +54,6 @@ export type Comment = z.infer<typeof commentSchema> & {
 export const commentTreeSchema: z.ZodType<Comment> = commentSchema.extend({
   comments: z.lazy(() => commentTreeSchema.array().default([])),
 });
-
-const titleUrlSchema = itemSchema.extend({
-  title: z.string(),
-  url: z.string().nullable().optional(),
-  score: z.number(),
-  kids: z.array(z.number()).default([]),
-  descendants: z.number().optional(),
-});
-
-export const storySchema = titleUrlSchema.extend({
-  type: z.enum(["story", "job"]),
-  text: z.string().optional(),
-});
-
-export type Story = z.infer<typeof storySchema>;
-
-export const askSchema = titleUrlSchema.extend({
-  type: z.literal("ask"),
-});
-
-export type Ask = z.infer<typeof askSchema>;
 
 const pollSchema = itemSchema.extend({
   type: z.literal("poll"),

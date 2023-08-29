@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
-import type { Story } from "~/models/apitype.server";
+import type { Item } from "~/models/apitype.server";
 
-export function Grid({ stories }: { stories: Story[] }) {
+export function Grid({ stories }: { stories: Item[] }) {
   return (
     <section className="bg-white dark:bg-gray-900">
       <div className="px-6 py-10 mx-auto">

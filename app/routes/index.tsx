@@ -1,27 +1,29 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
+import { O } from "@mobily/ts-belt";
 import { Await, useLoaderData } from "@remix-run/react";
+import type { LoaderArgs } from "@remix-run/server-runtime";
 import { defer } from "@remix-run/server-runtime";
 import { Suspense } from "react";
-import { getItem, getTopStories } from "~/models/api.server";
-import { redisclient } from "~/redis.server";
+import { getStoryById, getTopStories } from "~/models/api.server";
 import { Grid } from "./grid";
 import NavBar from "./nav";
 
-export async function loader() {
-  const cached = await redisclient.get("index");
-  if (cached) {
-    return defer({ stories: JSON.parse(cached) });
-  }
+export async function loader({ request }: LoaderArgs) {
+  const url = new URL(request.url);
+  const page: number = pipe(
+    O.fromNullable(url.searchParams.get("page")),
+    O.mapWithDefault(0, (page: string) => parseInt(page))
+  );
 
-  const storyIds = await getTopStories(20);
+  const storyIds = await getTopStories(page);
+
   const stories = await pipe(
     storyIds,
     toAsync,
-    map((id) => getItem(id)),
+    map(getStoryById),
     concurrent(10),
     toArray
   );
-  redisclient.setex("index", 15 * 60, JSON.stringify(stories));
 
   return defer({ stories });
 }

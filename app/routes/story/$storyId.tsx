@@ -7,18 +7,18 @@ import {
 } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import CommentTree from "~/components/comment-tree";
-import {
-  storySchema,
-  type Comment,
-  commentTreeSchema,
-} from "~/models/apitype.server";
 import { getComment, getItem } from "~/models/api.server";
+import {
+  commentTreeSchema,
+  type Comment,
+  itemSchema,
+} from "~/models/apitype.server";
 import { redisclient } from "~/redis.server";
 import NavBar from "../nav";
 
 export async function loader({ params }: { params: { storyId: number } }) {
   const story = await getItem(params.storyId);
-  return json(storySchema.parse(story));
+  return json(itemSchema.parse(story));
 }
 
 type ActionData = {
