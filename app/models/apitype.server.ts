@@ -17,10 +17,10 @@ const convertDateToIntlFormat = (date: Date) =>
 
 export type ItemType = "job" | "story" | "comment" | "poll" | "pollopt";
 
-export const itemSchema = z.object({
+const baseSchema = z.object({
   id: z.number(),
-  type: z.enum(["job", "story", "comment", "poll", "pollopt"]),
-  by: z.string(),
+  type: z.enum(["job", "story", "comment", "poll", "pollopt", "comment"]),
+  by: z.string().optional(),
   time: z
     .number()
     .or(z.string())
@@ -29,6 +29,9 @@ export const itemSchema = z.object({
         ? pipe(val, convertTimeToDate, convertDateToIntlFormat)
         : val
     ),
+});
+
+export const itemSchema = baseSchema.extend({
   title: z.string(),
   text: z.string().optional(),
   score: z.number(),
@@ -40,8 +43,9 @@ export const itemSchema = z.object({
 
 export type Item = z.infer<typeof itemSchema>;
 
-export const commentSchema = itemSchema.extend({
+export const commentSchema = baseSchema.extend({
   type: z.literal("comment"),
+  text: z.string(),
   parent: z.number(),
   kids: z.array(z.number()).default([]),
 });
