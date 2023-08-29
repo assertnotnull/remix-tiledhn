@@ -44,9 +44,13 @@ export function cache15Min(key: string, item: Item) {
   return redisclient.setex(key, 15 * 60, JSON.stringify(item));
 }
 
+export function getItem(id: number) {
+  return callAPI(`${itemPath}/${id}.json`);
+}
+
 export async function getStoryById(id: number) {
   return getCached<Item>(`item:${id}`, async () => {
-    const item = await callAPI(`${itemPath}/${id}.json`);
+    const item = await getItem(id);
     try {
       const validItem = itemSchema.parse(item);
       cache15Min(`item:${id}`, validItem);

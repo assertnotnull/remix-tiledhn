@@ -7,11 +7,11 @@ import {
 } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import CommentTree from "~/components/comment-tree";
-import { getComment, getItem } from "~/models/api.server";
+import { getComment, getItem, getStoryById } from "~/models/api.server";
 import {
   commentTreeSchema,
-  type Comment,
   itemSchema,
+  type Comment,
 } from "~/models/apitype.server";
 import { redisclient } from "~/redis.server";
 import NavBar from "../nav";
