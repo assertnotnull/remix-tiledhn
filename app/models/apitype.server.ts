@@ -45,7 +45,7 @@ export type Item = z.infer<typeof itemSchema>;
 
 export const commentSchema = baseSchema.extend({
   type: z.literal("comment"),
-  text: z.string(),
+  text: z.string().optional(),
   parent: z.number(),
   kids: z.array(z.number()).default([]),
 });

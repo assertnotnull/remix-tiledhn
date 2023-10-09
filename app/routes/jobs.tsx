@@ -2,12 +2,13 @@ import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import { Await, useLoaderData } from "@remix-run/react";
 import { defer } from "@remix-run/server-runtime";
 import { Suspense } from "react";
-import { getItem, getJobStories, getStoryById } from "~/models/api.server";
+import { getStoryById } from "~/models/api.server";
+import { getCachedPaginatedStoryIds } from "~/models/cached-api.server";
 import { Grid } from "./grid";
 import NavBar from "./nav";
 
 export async function loader() {
-  const storyIds = await getJobStories(0);
+  const { page: storyIds, total } = await getCachedPaginatedStoryIds("job", 0);
   const stories = await pipe(
     storyIds,
     toAsync,
@@ -16,8 +17,10 @@ export async function loader() {
     toArray
   );
 
-  return defer({ stories });
+  return defer({ stories, total });
 }
+
+export async function action({ request }: { request: Request }) {}
 
 export default function Index() {
   const data = useLoaderData<typeof loader>();

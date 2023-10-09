@@ -1,5 +1,4 @@
-import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -10,10 +9,8 @@ import {
   isRouteErrorResponse,
   useRouteError,
 } from "@remix-run/react";
-
+import type { PropsWithChildren } from "react";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
-import { getUser } from "./session.server";
-import { PropsWithChildren, ReactComponentElement, ReactNode } from "react";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
@@ -24,12 +21,6 @@ export const meta: MetaFunction = () => ({
   title: "Remixed Tiled Hackernews",
   viewport: "width=device-width,initial-scale=1",
 });
-
-export async function loader({ request }: LoaderArgs) {
-  return json({
-    user: await getUser(request),
-  });
-}
 
 export default function App() {
   return (
@@ -70,6 +61,7 @@ function RootError({ children }: PropsWithChildren) {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  let stack = "";
 
   if (isRouteErrorResponse(error)) {
     return (
@@ -86,6 +78,7 @@ export function ErrorBoundary() {
   let errorMessage = "Unknown error";
   if (isDefinitelyAnError(error)) {
     errorMessage = error.message;
+    stack = error.stack ? error.stack : "";
   }
 
   return (
@@ -94,6 +87,7 @@ export function ErrorBoundary() {
         <h1>Uh oh ...</h1>
         <p>Something went wrong.</p>
         <pre>{errorMessage}</pre>
+        <pre>Stack: {stack}</pre>
       </div>
     </RootError>
   );

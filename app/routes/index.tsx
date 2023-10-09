@@ -1,22 +1,19 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
-import { O } from "@mobily/ts-belt";
 import { Await, useLoaderData } from "@remix-run/react";
 import type { LoaderArgs } from "@remix-run/server-runtime";
 import { defer } from "@remix-run/server-runtime";
 import { Suspense } from "react";
-import { getStoryById, getTopStories } from "~/models/api.server";
+import { Maybe } from "true-myth";
+import { getStoryById } from "~/models/api.server";
+import { getCachedPaginatedStoryIds } from "~/models/cached-api.server";
 import { Grid } from "./grid";
 import NavBar from "./nav";
 
 export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url);
-  const page: number = pipe(
-    O.fromNullable(url.searchParams.get("page")),
-    O.mapWithDefault(0, (page: string) => parseInt(page))
-  );
+  const page = Maybe.of(url.searchParams.get("page")).mapOr(0, (page) => +page);
 
-  const storyIds = await getTopStories(page);
-
+  const { page: storyIds } = await getCachedPaginatedStoryIds("top", page);
   const stories = await pipe(
     storyIds,
     toAsync,

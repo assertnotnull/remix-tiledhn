@@ -2,29 +2,24 @@ import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import { Await, useLoaderData } from "@remix-run/react";
 import { defer } from "@remix-run/server-runtime";
 import { Suspense } from "react";
-import { getItem, getShowStories } from "~/models/api.server";
+import { getItem, getStoryIdsBySection } from "~/models/api.server";
 import { itemSchema } from "~/models/apitype.server";
 import { redisclient } from "~/redis.server";
 import { Grid } from "./grid";
 import NavBar from "./nav";
+import { getCachedPaginatedStoryIds } from "~/models/cached-api.server";
 
 export async function loader() {
-  const cached = await redisclient.get("show");
-  if (cached) {
-    return defer({ stories: JSON.parse(cached) });
-  }
+  const { page: storyIds } = await getCachedPaginatedStoryIds("show", 0);
 
-  const storyIds = await getShowStories(20);
   const stories = await pipe(
     storyIds,
     toAsync,
     map((id) => getItem(id)),
     map((story) => itemSchema.parse(story)),
     concurrent(10),
-
     toArray
   );
-  redisclient.setex("show", 15 * 60, JSON.stringify(stories));
 
   return defer({ stories });
 }

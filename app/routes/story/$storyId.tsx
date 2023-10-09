@@ -1,4 +1,4 @@
-import { map, pipe, toArray, toAsync } from "@fxts/core";
+import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import {
   Form,
   useActionData,
@@ -7,7 +7,7 @@ import {
 } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import CommentTree from "~/components/comment-tree";
-import { getComment, getItem, getStoryById } from "~/models/api.server";
+import { getComment, getItem } from "~/models/api.server";
 import {
   commentTreeSchema,
   itemSchema,
@@ -34,11 +34,12 @@ export async function action({ request }: { request: Request }) {
     if (cachedComments) {
       return json({ comments: JSON.parse(cachedComments) });
     }
-    const kids: string = (body.get("kids") as string) || "";
+    const kidCommentIds: string = (body.get("kids") as string) || "";
     const comments = await pipe(
-      kids.split(","),
+      kidCommentIds.split(","),
       toAsync,
-      map((id) => getComment(parseInt(id))),
+      map((id) => getComment(+id)),
+      concurrent(20),
       toArray
     );
     redisclient.setex(`comments:${storyId}`, 10 * 60, JSON.stringify(comments));
