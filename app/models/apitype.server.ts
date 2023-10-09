@@ -1,6 +1,7 @@
 import { pipe } from "@fxts/core";
 import { z } from "zod";
 
+//Zod schemas based on https://github.com/HackerNews/API, updated to actual API responses
 const formatOptions: Intl.DateTimeFormatOptions = {
   year: "numeric",
   month: "numeric",
@@ -17,6 +18,8 @@ const convertDateToIntlFormat = (date: Date) =>
 
 export type ItemType = "job" | "story" | "comment" | "poll" | "pollopt";
 
+// Creating a schema for each type below (job, story, etc.) provided no benefit as some values of itemSchema was there or not.
+// It was just easier to have itemSchema represent all types.
 const baseSchema = z.object({
   id: z.number(),
   type: z.enum(["job", "story", "comment", "poll", "pollopt", "comment"]),
