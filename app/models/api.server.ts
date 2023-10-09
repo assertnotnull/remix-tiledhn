@@ -58,6 +58,7 @@ export async function getComment(id: number) {
   return comment;
 }
 
+//The api returns a fixed number of story ids per section, so we need to paginate them
 export async function paginateStoryIds(key: Section) {
   const storyIds = await getStoryIdsBySection(key);
   return splitEvery(20, storyIds);
