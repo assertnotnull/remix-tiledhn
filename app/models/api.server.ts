@@ -11,13 +11,13 @@ const itemPath = `${root}/item`;
 
 export type Section = "top" | "job" | "ask" | "show";
 
-async function callAPI(url: string) {
+async function callAPI(url: string): Promise<string | null> {
   try {
     const res = await fetch(url);
     return await res.json();
   } catch (err) {
     console.log(err);
-    return;
+    return null;
   }
 }
 
