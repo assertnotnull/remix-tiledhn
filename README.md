@@ -2,7 +2,13 @@
 
 ![Screenshot of the UI](./screenshot.png)
 
-Install intructions:
+## Requirements
+
+Docker, Podman or Redis installed locally.
+
+If you have Podman or Docker just bring up the docker-compose.yml
+
+## Install intructions
 
 ```
 pnpm i
