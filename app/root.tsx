@@ -16,11 +16,13 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
 };
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Remixed Tiled Hackernews",
-  viewport: "width=device-width,initial-scale=1",
-});
+export const meta: MetaFunction = () => [
+  {
+    charset: "utf-8",
+    title: "Remixed Tiled Hackernews",
+    viewport: "width=device-width,initial-scale=1",
+  },
+];
 
 export default function App() {
   return (
