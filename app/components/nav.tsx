@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link, NavLink } from "@remix-run/react";
 
 export default function NavBar() {
   const sections = [
@@ -34,9 +34,15 @@ export default function NavBar() {
           >
             {sections.map((section) => (
               <li key={section.name}>
-                <Link prefetch="intent" to={section.path}>
+                <NavLink
+                  prefetch="intent"
+                  to={section.path}
+                  className={({ isActive, isPending }) =>
+                    isActive ? "active" : isPending ? "pending" : ""
+                  }
+                >
                   {section.name}
-                </Link>
+                </NavLink>
               </li>
             ))}
           </ul>

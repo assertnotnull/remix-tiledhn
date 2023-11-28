@@ -14,7 +14,7 @@ import {
   type Comment,
 } from "~/models/apitype.server";
 import { redisclient } from "~/redis.server";
-import NavBar from "../nav";
+import NavBar from "../../components/nav";
 
 export async function loader({ params }: { params: { storyId: number } }) {
   const story = await getItem(params.storyId);
@@ -58,66 +58,63 @@ export default function Index() {
   const isLoadingComments = transition.state === "submitting";
 
   return (
-    <main>
-      <NavBar />
-      <Form method="post">
-        <input type="hidden" name="storyId" value={story.id} />
-        <section className="bg-white dark:bg-gray-900">
-          <div className="px-6 py-10 mx-auto">
-            <div className="grid grid-cols-1 gap-4">
-              <div className="card w-full bg-base-100 shadow-xl">
-                <div className="card-body">
-                  <h2 className="card-title">{story.title}</h2>
-                  <p>
-                    {story.score} - {story.time}
-                  </p>
-                  {story.text ? (
-                    <div>
-                      <br />
-                      <p dangerouslySetInnerHTML={{ __html: story.text }}></p>
-                    </div>
-                  ) : null}
-                  {story.url ? (
-                    <a className="btn btn-primary" href={story.url}>
-                      Source
-                    </a>
-                  ) : null}
-                  {story.descendants ? (
-                    <button
-                      type="submit"
-                      name="intent"
-                      value="loadComment"
-                      className="btn btn-ghost"
-                      disabled={
-                        isLoadingComments ||
-                        (data?.comments && data?.comments.length > 0)
-                      }
-                    >
-                      {isLoadingComments
-                        ? "loading comments.."
-                        : `${story.descendants} Comments`}
-                    </button>
-                  ) : (
-                    <button className="btn btn-ghost" disabled>
-                      No comments
-                    </button>
-                  )}
-                  {story.kids && (
-                    <input
-                      type="hidden"
-                      name="kids"
-                      value={story.kids.toString()}
-                    />
-                  )}
-                  <ul>
-                    <CommentTree comments={data?.comments ?? []} />
-                  </ul>
-                </div>
+    <Form method="post">
+      <input type="hidden" name="storyId" value={story.id} />
+      <section className="bg-white dark:bg-gray-900">
+        <div className="px-6 py-10 mx-auto">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="card w-full bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">{story.title}</h2>
+                <p>
+                  {story.score} - {story.time}
+                </p>
+                {story.text ? (
+                  <div>
+                    <br />
+                    <p dangerouslySetInnerHTML={{ __html: story.text }}></p>
+                  </div>
+                ) : null}
+                {story.url ? (
+                  <a className="btn btn-primary" href={story.url}>
+                    Source
+                  </a>
+                ) : null}
+                {story.descendants ? (
+                  <button
+                    type="submit"
+                    name="intent"
+                    value="loadComment"
+                    className="btn btn-ghost"
+                    disabled={
+                      isLoadingComments ||
+                      (data?.comments && data?.comments.length > 0)
+                    }
+                  >
+                    {isLoadingComments
+                      ? "loading comments.."
+                      : `${story.descendants} Comments`}
+                  </button>
+                ) : (
+                  <button className="btn btn-ghost" disabled>
+                    No comments
+                  </button>
+                )}
+                {story.kids && (
+                  <input
+                    type="hidden"
+                    name="kids"
+                    value={story.kids.toString()}
+                  />
+                )}
+                <ul>
+                  <CommentTree comments={data?.comments ?? []} />
+                </ul>
               </div>
             </div>
           </div>
-        </section>
-      </Form>
-    </main>
+        </div>
+      </section>
+    </Form>
   );
 }
