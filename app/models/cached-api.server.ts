@@ -34,14 +34,13 @@ export async function getCachedPaginatedStoryIds(
     return pagedIds[pageNumber] ?? [];
   });
 
-  const total = Maybe.of(await redisclient.get(`${section}:total`)).mapOr(
-    20,
-    (total) => +total
-  );
+  const numberOfPages = Maybe.of(
+    await redisclient.get(`${section}:total`)
+  ).mapOr(20, (total) => +total);
 
   return {
     page: pageOfIds,
-    total,
+    numberOfPages,
   };
 }
 
