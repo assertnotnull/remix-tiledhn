@@ -100,7 +100,7 @@ export default function App() {
               </ul>
             </div>
             <div className="navbar-end">
-              <Link to="/" className="btn">
+              <Link to="/about" className="btn">
                 About
               </Link>
             </div>
