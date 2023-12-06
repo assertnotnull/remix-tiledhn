@@ -1,5 +1,6 @@
 import { pipe } from "@fxts/core";
 import { z } from "zod";
+import formatRelative from "date-fns/formatRelative/index.js";
 
 //Zod schemas based on https://github.com/HackerNews/API, updated to actual API responses
 const formatOptions: Intl.DateTimeFormatOptions = {
@@ -13,8 +14,7 @@ const formatOptions: Intl.DateTimeFormatOptions = {
 };
 
 const convertTimeToDate = (time: number) => new Date(time * 1000);
-const convertDateToIntlFormat = (date: Date) =>
-  new Intl.DateTimeFormat("en-US", formatOptions).format(date);
+const convertDateToRelative = (date: Date) => formatRelative(date, new Date());
 
 export type ItemType = "job" | "story" | "comment" | "poll" | "pollopt";
 
@@ -29,8 +29,8 @@ const baseSchema = z.object({
     .or(z.string())
     .transform((val) =>
       typeof val === "number"
-        ? pipe(val, convertTimeToDate, convertDateToIntlFormat)
-        : val
+        ? pipe(val, convertTimeToDate, convertDateToRelative)
+        : formatRelative(new Date(val), new Date())
     ),
 });
 

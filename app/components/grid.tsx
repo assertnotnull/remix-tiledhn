@@ -21,7 +21,7 @@ export function Grid({
               <div className="card-body">
                 <h2 className="card-title">{story.title}</h2>
                 <p>
-                  {story.score} - {story.time}
+                  {story.score} points - {story.time}
                 </p>
 
                 {story.url ? (
