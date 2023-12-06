@@ -30,7 +30,7 @@ const baseSchema = z.object({
     .transform((val) =>
       typeof val === "number"
         ? pipe(val, convertTimeToDate, convertDateToRelative)
-        : formatRelative(new Date(val), new Date())
+        : val
     ),
 });
 
