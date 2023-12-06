@@ -30,9 +30,11 @@ export async function action({ request }: { request: Request }) {
   const intent = body.get("intent");
   const storyId = body.get("storyId");
   if (intent === "loadComment") {
-    const cachedComments = await cacheClient.get(`comments:${storyId}`);
+    const cachedComments = (await cacheClient.getItem(
+      `comments:${storyId}`
+    )) as string;
     if (cachedComments) {
-      return json({ comments: JSON.parse(cachedComments) });
+      return json({ comments: cachedComments });
     }
     const kidCommentIds: string = (body.get("kids") as string) || "";
     const comments = await pipe(
@@ -42,7 +44,9 @@ export async function action({ request }: { request: Request }) {
       concurrent(20),
       toArray
     );
-    cacheClient.setex(`comments:${storyId}`, 10 * 60, JSON.stringify(comments));
+    cacheClient.setItem(`comments:${storyId}`, JSON.stringify(comments), {
+      ttl: 10 * 60,
+    });
     return json({
       comments: comments.map((comment) => commentTreeSchema.parse(comment)),
     });
