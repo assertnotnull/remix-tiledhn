@@ -13,7 +13,7 @@ import {
   itemSchema,
   type Comment,
 } from "~/models/apitype.server";
-import { redisclient } from "~/redis.server";
+import { cacheClient } from "~/redis.server";
 import NavBar from "../../components/nav";
 
 export async function loader({ params }: { params: { storyId: number } }) {
@@ -30,7 +30,7 @@ export async function action({ request }: { request: Request }) {
   const intent = body.get("intent");
   const storyId = body.get("storyId");
   if (intent === "loadComment") {
-    const cachedComments = await redisclient.get(`comments:${storyId}`);
+    const cachedComments = await cacheClient.get(`comments:${storyId}`);
     if (cachedComments) {
       return json({ comments: JSON.parse(cachedComments) });
     }
@@ -42,7 +42,7 @@ export async function action({ request }: { request: Request }) {
       concurrent(20),
       toArray
     );
-    redisclient.setex(`comments:${storyId}`, 10 * 60, JSON.stringify(comments));
+    cacheClient.setex(`comments:${storyId}`, 10 * 60, JSON.stringify(comments));
     return json({
       comments: comments.map((comment) => commentTreeSchema.parse(comment)),
     });

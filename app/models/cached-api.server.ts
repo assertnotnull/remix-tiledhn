@@ -1,5 +1,5 @@
 import { Maybe } from "true-myth";
-import { redisclient } from "~/redis.server";
+import { cacheClient } from "~/redis.server";
 import type { Section } from "./api.server";
 import { getStoryById, paginateStoryIds } from "./api.server";
 import type { Item } from "./apitype.server";
@@ -9,8 +9,8 @@ export async function getCached<T>(
   call: () => Promise<T>
 ): Promise<T> {
   try {
-    const cached = await redisclient.get(key);
-    return cached ? JSON.parse(cached) : call();
+    const cached = (await cacheClient.getItem(key)) as T;
+    return cached ? cached : call();
   } catch (err) {
     console.log(err);
     return call();
@@ -28,14 +28,16 @@ export async function getCachedPaginatedStoryIds(
   const pageOfIds = await getCached(`${section}:${pageNumber}`, async () => {
     const pagedIds = await paginateStoryIds(section);
     pagedIds.forEach((storyIds, i) =>
-      redisclient.setex(`${section}:${i}`, 15 * 60, JSON.stringify(storyIds))
+      cacheClient.setItem(`${section}:${i}`, JSON.stringify(storyIds), {
+        ttl: 15 * 60,
+      })
     );
-    redisclient.set(`${section}:total`, pagedIds.length);
+    cacheClient.setItem(`${section}:total`, pagedIds.length);
     return pagedIds[pageNumber] ?? [];
   });
 
   const numberOfPages = Maybe.of(
-    await redisclient.get(`${section}:total`)
+    await cacheClient.getItem(`${section}:total`)
   ).mapOr(20, (total) => +total);
 
   return {
@@ -45,5 +47,5 @@ export async function getCachedPaginatedStoryIds(
 }
 
 export function cache15Min(key: string, item: Item) {
-  return redisclient.setex(key, 15 * 60, JSON.stringify(item));
+  return cacheClient.setItem(key, JSON.stringify(item), { ttl: 15 * 60 });
 }

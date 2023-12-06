@@ -1,4 +1,6 @@
-import { Redis } from "ioredis";
+import { createStorage } from "unstorage";
+import redisDriver from "unstorage/drivers/redis";
+import vercelKVDriver from "unstorage/drivers/vercel-kv";
 import { z } from "zod";
 
 const redisEnvSchema = z.object({
@@ -13,9 +15,11 @@ const redisEnvSchema = z.object({
 
 const config = redisEnvSchema.parse(process.env);
 
-export const redisclient = new Redis({
-  host: config.REDIS_HOST,
-  port: config.REDIS_PORT,
-  username: config.REDIS_USERNAME,
-  password: config.REDIS_PASSWORD,
+export const cacheClient = createStorage({
+  driver:
+    process.env.NODE_ENV === "development"
+      ? redisDriver({ base: "unstorage" })
+      : vercelKVDriver({
+          base: "tiledhn",
+        }),
 });
