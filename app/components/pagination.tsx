@@ -1,33 +1,28 @@
-import React from "react";
+import { useSearchParams } from "@remix-run/react";
+import classNames from "classnames";
 
-const Paginate = ({
-  perPage,
-  total,
-  goToPage,
-}: {
-  perPage: number;
-  total: number;
-  goToPage: (page: number) => void;
-}) => {
-  const pageNumbers = [];
-
-  for (let i = 1; i <= Math.ceil(total / perPage); i++) {
-    pageNumbers.push(i);
-  }
+const Paginate = ({ numberOfPages }: { numberOfPages: number }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = searchParams.get("page") ?? "1";
 
   return (
-    <div className="pagination-container">
-      <ul className="pagination">
-        {pageNumbers.map((number) => (
-          <li
-            key={number}
-            onClick={() => goToPage(number)}
-            className="page-number"
-          >
-            {number}
-          </li>
-        ))}
-      </ul>
+    <div className="flex justify-center py-4 gap-1">
+      {new Array(numberOfPages).fill(0).map((_, i) => (
+        <button
+          key={i}
+          className={classNames("btn", {
+            "btn-active": i + 1 == +currentPage,
+          })}
+          onClick={() => {
+            const indexPlusOne = i + 1;
+            const params = new URLSearchParams();
+            params.set("page", indexPlusOne.toString());
+            setSearchParams(params);
+          }}
+        >
+          {i + 1}
+        </button>
+      ))}
     </div>
   );
 };
