@@ -98,7 +98,7 @@ export default function App() {
               </Link>
             </div>
             <div className="navbar-center hidden lg:flex">
-              <ul className="menu menu-horizontal ">
+              <ul className="menu menu-horizontal">
                 {sections.map((section) => (
                   <li key={section.name} className="px-1">
                     <NavLink
