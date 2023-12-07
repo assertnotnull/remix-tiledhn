@@ -58,6 +58,15 @@ export async function action({ request }: { request: Request }) {
   return json({ comments: [] });
 }
 
+function LoadingComments() {
+  return (
+    <div>
+      Loading comments...
+      <span className="loading loading-dots loading-md"></span>
+    </div>
+  );
+}
+
 export default function Index() {
   const { story, comments } = useLoaderData<typeof loader>();
 
@@ -73,7 +82,7 @@ export default function Index() {
               <div className="card-body">
                 <h2 className="card-title">{story.title}</h2>
                 <p>
-                  {story.score} - {story.time}
+                  {story.score} points - {story.time}
                 </p>
                 {story.text ? (
                   <div>
@@ -90,16 +99,13 @@ export default function Index() {
                     Source
                   </a>
                 ) : null}
-
-                <Suspense fallback={<div>loading comments </div>}>
-                  <Await resolve={comments}>
-                    {(comments) => (
-                      <ul>
-                        <CommentTree comments={comments} />
-                      </ul>
-                    )}
-                  </Await>
-                </Suspense>
+                <div className="mt-4 pt-4 border-t border-gray-500">
+                  <Suspense fallback={<LoadingComments />}>
+                    <Await resolve={comments}>
+                      {(comments) => <CommentTree comments={comments} />}
+                    </Await>
+                  </Suspense>
+                </div>
               </div>
             </div>
           </div>
