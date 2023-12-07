@@ -7,6 +7,7 @@ import { getStoryById } from "~/models/api.server";
 import { getCachedPaginatedStoryIds } from "~/models/cached-api.server";
 import { Grid } from "../components/grid";
 import Loading from "~/components/loading";
+import Paginate from "~/components/pagination";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -34,12 +35,15 @@ export default function Index() {
   const data = useLoaderData<typeof loader>();
 
   return (
-    <Suspense fallback={<Loading />}>
-      <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
-        {(stories) => (
-          <Grid stories={stories} numberOfPages={data.numberOfPages} />
-        )}
-      </Await>
-    </Suspense>
+    <>
+      <Suspense fallback={<Loading />}>
+        <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
+          {(stories) => (
+            <Grid stories={stories} numberOfPages={data.numberOfPages} />
+          )}
+        </Await>
+      </Suspense>
+      <Paginate numberOfPages={data.numberOfPages} />
+    </>
   );
 }

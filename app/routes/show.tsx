@@ -7,6 +7,7 @@ import { itemSchema } from "~/models/apitype.server";
 import { getCachedPaginatedStoryIds } from "~/models/cached-api.server";
 import { Grid } from "../components/grid";
 import Loading from "~/components/loading";
+import Paginate from "~/components/pagination";
 
 export async function loader() {
   const { page: storyIds, numberOfPages } = await getCachedPaginatedStoryIds(
@@ -29,12 +30,15 @@ export async function loader() {
 export default function Index() {
   const data = useLoaderData<typeof loader>();
   return (
-    <Suspense fallback={<Loading />}>
-      <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
-        {(stories) => (
-          <Grid stories={stories} numberOfPages={data.numberOfPages} />
-        )}
-      </Await>
-    </Suspense>
+    <>
+      <Suspense fallback={<Loading />}>
+        <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
+          {(stories) => (
+            <Grid stories={stories} numberOfPages={data.numberOfPages} />
+          )}
+        </Await>
+      </Suspense>
+      <Paginate numberOfPages={data.numberOfPages} />
+    </>
   );
 }
