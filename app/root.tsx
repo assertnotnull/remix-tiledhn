@@ -34,6 +34,7 @@ export const meta: MetaFunction = () => [
 
 export default function App() {
   const navigation = useNavigation();
+
   const sections = [
     { name: "Stories", path: "/" },
     { name: "Ask", path: "/ask" },
@@ -75,7 +76,7 @@ export default function App() {
                 </label>
                 <ul
                   tabIndex={0}
-                  className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+                  className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 z-20"
                 >
                   {sections.map((section) => (
                     <li key={section.name}>
@@ -97,10 +98,18 @@ export default function App() {
               </Link>
             </div>
             <div className="navbar-center hidden lg:flex">
-              <ul className="menu menu-horizontal p-0">
+              <ul className="menu menu-horizontal ">
                 {sections.map((section) => (
-                  <li key={section.name}>
-                    <Link to={section.path}>{section.name}</Link>
+                  <li key={section.name} className="px-1">
+                    <NavLink
+                      prefetch="intent"
+                      to={section.path}
+                      className={({ isActive, isPending }) =>
+                        isActive ? "active" : isPending ? "pending" : ""
+                      }
+                    >
+                      {section.name}
+                    </NavLink>
                   </li>
                 ))}
               </ul>
