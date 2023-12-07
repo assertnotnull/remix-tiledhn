@@ -61,6 +61,21 @@ export default function About() {
           >
             LinkedIn
           </a>
+
+          <a
+            className="btn btn-primary mr-4"
+            href="https://github.com/HackerNews/API"
+            target="blank"
+          >
+            Hacker News API
+          </a>
+          <a
+            className="btn btn-primary mr-4"
+            href="https://github.com/assertnotnull/remix-tiledhn"
+            target="blank"
+          >
+            Repo
+          </a>
         </div>
       </div>
     </div>

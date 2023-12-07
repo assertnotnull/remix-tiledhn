@@ -1,11 +1,7 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useNavigation,
-} from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
+import { Await, Form, useLoaderData, useNavigation } from "@remix-run/react";
+import { defer, json } from "@remix-run/server-runtime";
+import { Suspense } from "react";
 import CommentTree from "~/components/comment-tree";
 import { getComment, getItem } from "~/models/api.server";
 import {
@@ -14,11 +10,19 @@ import {
   type Comment,
 } from "~/models/apitype.server";
 import { cacheClient } from "~/redis.server";
-import NavBar from "../../components/nav";
 
 export async function loader({ params }: { params: { storyId: number } }) {
-  const story = await getItem(params.storyId);
-  return json(itemSchema.parse(story));
+  const storyData = await getItem(params.storyId);
+  const story = itemSchema.parse(storyData);
+  const comments = pipe(
+    story.kids,
+    toAsync,
+    map((id) => getComment(+id)),
+    concurrent(20),
+    toArray
+  );
+
+  return defer({ story, comments });
 }
 
 type ActionData = {
@@ -55,16 +59,14 @@ export async function action({ request }: { request: Request }) {
 }
 
 export default function Index() {
-  const story = useLoaderData<typeof loader>();
-  const data = useActionData<ActionData>();
+  const { story, comments } = useLoaderData<typeof loader>();
 
   const transition = useNavigation();
-  const isLoadingComments = transition.state === "submitting";
 
   return (
     <Form method="post">
       <input type="hidden" name="storyId" value={story.id} />
-      <section className="bg-white dark:bg-gray-900">
+      <section className="bg-base-200">
         <div className="px-6 py-10 mx-auto">
           <div className="grid grid-cols-1 gap-4">
             <div className="card w-full bg-base-100 shadow-xl">
@@ -80,40 +82,24 @@ export default function Index() {
                   </div>
                 ) : null}
                 {story.url ? (
-                  <a className="btn btn-primary" href={story.url}>
+                  <a
+                    className="btn btn-primary"
+                    href={story.url}
+                    target="_blank"
+                  >
                     Source
                   </a>
                 ) : null}
-                {story.descendants ? (
-                  <button
-                    type="submit"
-                    name="intent"
-                    value="loadComment"
-                    className="btn btn-ghost"
-                    disabled={
-                      isLoadingComments ||
-                      (data?.comments && data?.comments.length > 0)
-                    }
-                  >
-                    {isLoadingComments
-                      ? "loading comments.."
-                      : `${story.descendants} Comments`}
-                  </button>
-                ) : (
-                  <button className="btn btn-ghost" disabled>
-                    No comments
-                  </button>
-                )}
-                {story.kids && (
-                  <input
-                    type="hidden"
-                    name="kids"
-                    value={story.kids.toString()}
-                  />
-                )}
-                <ul>
-                  <CommentTree comments={data?.comments ?? []} />
-                </ul>
+
+                <Suspense fallback={<div>loading comments </div>}>
+                  <Await resolve={comments}>
+                    {(comments) => (
+                      <ul>
+                        <CommentTree comments={comments} />
+                      </ul>
+                    )}
+                  </Await>
+                </Suspense>
               </div>
             </div>
           </div>

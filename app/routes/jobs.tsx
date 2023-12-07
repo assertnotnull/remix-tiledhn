@@ -6,6 +6,7 @@ import { getStoryById } from "~/models/api.server";
 import { getCachedPaginatedStoryIds } from "~/models/cached-api.server";
 import { Grid } from "../components/grid";
 import { Maybe } from "true-myth";
+import Loading from "~/components/loading";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -17,7 +18,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     "job",
     pageIndex
   );
-  const stories = await pipe(
+  const stories = pipe(
     storyIds,
     toAsync,
     map(getStoryById),
@@ -34,7 +35,7 @@ export default function Index() {
   const data = useLoaderData<typeof loader>();
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loading />}>
       <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
         {(stories) => (
           <Grid stories={stories} numberOfPages={data.numberOfPages} />

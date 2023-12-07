@@ -6,6 +6,7 @@ import { getItem } from "~/models/api.server";
 import { itemSchema } from "~/models/apitype.server";
 import { getCachedPaginatedStoryIds } from "~/models/cached-api.server";
 import { Grid } from "../components/grid";
+import Loading from "~/components/loading";
 
 export async function loader() {
   const { page: storyIds, numberOfPages } = await getCachedPaginatedStoryIds(
@@ -13,7 +14,7 @@ export async function loader() {
     0
   );
 
-  const stories = await pipe(
+  const stories = pipe(
     storyIds,
     toAsync,
     map((id) => getItem(id)),
@@ -28,7 +29,7 @@ export async function loader() {
 export default function Index() {
   const data = useLoaderData<typeof loader>();
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loading />}>
       <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
         {(stories) => (
           <Grid stories={stories} numberOfPages={data.numberOfPages} />

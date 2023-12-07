@@ -13,9 +13,9 @@ export function Grid({
   const currentPage = searchParams.get("page") ?? "1";
 
   return (
-    <section className="bg-white dark:bg-gray-900">
+    <section className="bg-base-200">
       <div className="px-6 py-10 mx-auto">
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
           {stories.map((story) => (
             <div key={story.id} className="card w-full bg-base-100 shadow-xl">
               <div className="card-body">
