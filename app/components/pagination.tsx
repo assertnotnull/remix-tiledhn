@@ -6,7 +6,7 @@ const Paginate = ({ numberOfPages }: { numberOfPages: number }) => {
   const currentPage = searchParams.get("page") ?? "1";
 
   return (
-    <div className="flex justify-center py-4 gap-1">
+    <div className="flex justify-center py-4 gap-1 fixed bottom-0 w-full bg-primary-content">
       {new Array(numberOfPages).fill(0).map((_, i) => (
         <button
           key={i}
