@@ -144,10 +144,7 @@ export default function App() {
               </Link>
             </div>
           </div>
-          <div
-            id="content"
-            className={navigation.state === "loading" ? "loading" : ""}
-          >
+          <div id="content">
             <Outlet />
           </div>
         </main>
