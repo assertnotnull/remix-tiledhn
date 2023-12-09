@@ -16,8 +16,10 @@ const Paginate = ({ numberOfPages }: { numberOfPages: number }) => {
           onClick={() => {
             const indexPlusOne = i + 1;
             const params = new URLSearchParams();
-            params.set("page", indexPlusOne.toString());
-            setSearchParams(params);
+            if (+currentPage !== indexPlusOne) {
+              params.set("page", indexPlusOne.toString());
+              setSearchParams(params);
+            }
           }}
         >
           {i + 1}
