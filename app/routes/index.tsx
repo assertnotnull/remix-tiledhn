@@ -1,5 +1,5 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
-import { Await, useLoaderData } from "@remix-run/react";
+import { Await, useLoaderData, useNavigation } from "@remix-run/react";
 import { LoaderFunctionArgs, defer } from "@remix-run/server-runtime";
 import { Suspense } from "react";
 import { Maybe } from "true-myth";
@@ -33,9 +33,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Index() {
   const data = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
 
   return (
     <>
+      {navigation.state === "loading" && <Loading />}
       <Suspense fallback={<Loading />}>
         <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
           {(stories) => (
