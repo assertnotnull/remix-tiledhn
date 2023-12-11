@@ -41,7 +41,7 @@ export default function App() {
     { name: "Jobs", path: "/jobs" },
     { name: "Show", path: "/show" },
   ];
-  const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [isDarkMode, setIsDarkMode] = React.useState(true);
 
   return (
     <html
