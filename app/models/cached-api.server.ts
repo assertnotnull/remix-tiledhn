@@ -6,7 +6,7 @@ import type { Item } from "./apitype.server";
 
 export async function getCached<T>(
   key: string,
-  call: () => Promise<T>
+  call: () => Promise<T>,
 ): Promise<T> {
   try {
     const cached = (await cacheClient.getItem(key)) as T;
@@ -23,25 +23,28 @@ export function getCachedStoryById(id: number) {
 
 export async function getCachedPaginatedStoryIds(
   section: Section,
-  pageNumber: number
+  pageNumber: number,
 ) {
-  const pageOfIds = await getCached(`${section}:${pageNumber}`, async () => {
-    const pagedIds = await paginateStoryIds(section);
-    pagedIds.forEach((storyIds, i) =>
-      cacheClient.setItem(`${section}:${i}`, JSON.stringify(storyIds), {
-        ttl: 15 * 60,
-      })
-    );
-    cacheClient.setItem(`${section}:total`, pagedIds.length);
-    return pagedIds[pageNumber] ?? [];
-  });
+  const pageOfStoryIds = await getCached(
+    `${section}:${pageNumber}`,
+    async () => {
+      const pagedIds = await paginateStoryIds(section);
+      pagedIds.forEach((storyIds, i) =>
+        cacheClient.setItem(`${section}:${i}`, JSON.stringify(storyIds), {
+          ttl: 15 * 60,
+        }),
+      );
+      cacheClient.setItem(`${section}:total`, pagedIds.length);
+      return pagedIds[pageNumber] ?? [];
+    },
+  );
 
   const numberOfPages = Maybe.of(
-    await cacheClient.getItem(`${section}:total`)
+    await cacheClient.getItem(`${section}:total`),
   ).mapOr(20, (total) => +total);
 
   return {
-    page: pageOfIds,
+    pageOfStoryIds,
     numberOfPages,
   };
 }

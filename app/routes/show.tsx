@@ -17,13 +17,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     (page) => +page - 1,
   );
 
-  const { page: storyIds, numberOfPages } = await getCachedPaginatedStoryIds(
+  const { pageOfStoryIds, numberOfPages } = await getCachedPaginatedStoryIds(
     "show",
     pageIndex,
   );
 
   const stories = pipe(
-    storyIds,
+    pageOfStoryIds,
     toAsync,
     map((id) => getItem(id)),
     map((story) => itemSchema.parse(story)),

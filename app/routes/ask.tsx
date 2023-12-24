@@ -13,20 +13,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const pageIndex = Maybe.of(url.searchParams.get("page")).mapOr(
     0,
-    (page) => +page - 1
+    (page) => +page - 1,
   );
 
-  const { page: storyIds, numberOfPages } = await getCachedPaginatedStoryIds(
+  const { pageOfStoryIds, numberOfPages } = await getCachedPaginatedStoryIds(
     "ask",
-    pageIndex
+    pageIndex,
   );
 
   const stories = pipe(
-    storyIds,
+    pageOfStoryIds,
     toAsync,
     map(getStoryById),
     concurrent(10),
-    toArray
+    toArray,
   );
 
   return defer({ stories, numberOfPages });
