@@ -25,8 +25,6 @@ It uses [FxTS](https://fxts.dev/) to concurrently get news details & comments.
 
 News/stories/comments are cached in Redis.
 
-Pagination to come...
-
 ## Files of interest
 
 - app/models/api.server.ts
