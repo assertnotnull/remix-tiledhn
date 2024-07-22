@@ -10,7 +10,7 @@ export function loader() {
   const size = 200;
 
   const imageUrl = new URL(
-    `https://www.gravatar.com/avatar/${emailHash}?s=${size}`
+    `https://www.gravatar.com/avatar/${emailHash}?s=${size}`,
   );
 
   return json({ imageUrl });
@@ -39,8 +39,8 @@ export default function About() {
               DaisyUI
             </a>
             ,{" "}
-            <a className="link" href="//redis.io" target="blank">
-              Redis
+            <a className="link" href="//unstorage.unjs.io/" target="blank">
+              Unstorage (Redis locally / vercel KV on Vercel)
             </a>
             ,{" "}
             <a className="link" href="//fxts.dev" target="blank">
