@@ -1,5 +1,4 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
-import { splitEvery } from "rambdax";
 import {
   commentTreeSchema,
   itemSchema,
@@ -26,7 +25,7 @@ export function getItem(id: number) {
 }
 
 export async function getStoryIdsBySection(
-  section: Section
+  section: Section,
 ): Promise<number[]> {
   const url = `${root}/${section}stories.json`;
   return pipe(callAPI(url), storyIdsSchema.parse);
@@ -45,7 +44,7 @@ export async function getStoryById(id: number) {
 export async function getComment(id: number) {
   const comment = await pipe(
     callAPI(`${itemPath}/${id}.json`),
-    commentTreeSchema.parse
+    commentTreeSchema.parse,
   );
 
   comment.comments = await pipe(
@@ -53,7 +52,7 @@ export async function getComment(id: number) {
     toAsync,
     map(getComment),
     concurrent(20),
-    toArray
+    toArray,
   );
   return comment;
 }
@@ -62,4 +61,16 @@ export async function getComment(id: number) {
 export async function paginateStoryIds(key: Section) {
   const storyIds = await getStoryIdsBySection(key);
   return splitEvery(20, storyIds);
+}
+
+function splitEvery<T extends Array<string | number>>(
+  sliceLength: number,
+  listOrString: T,
+) {
+  const batches: Array<Array<string | number>> = [];
+  let counter = 0;
+  while (counter < listOrString.length) {
+    batches.push(listOrString.slice(counter, (counter += sliceLength)));
+  }
+  return batches;
 }
