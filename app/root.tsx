@@ -17,6 +17,7 @@ import appcss from "./styles/app.css";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import React from "react";
 import NavBar from "./components/nav";
+import { DarkModeContext } from "./components/darkmodeContext";
 
 export const links: LinksFunction = () => {
   return [
@@ -45,27 +46,29 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = React.useState(true);
 
   return (
-    <html
-      lang="en"
-      className="h-full"
-      data-theme={isDarkMode ? "night" : "winter"}
-    >
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body className="h-full">
-        <main>
-          <NavBar />
-          <div id="content">
-            <Outlet />
-          </div>
-        </main>
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
+    <DarkModeContext.Provider value={{ isDarkMode, setIsDarkMode }}>
+      <html
+        lang="en"
+        className="h-full"
+        data-theme={isDarkMode ? "night" : "winter"}
+      >
+        <head>
+          <Meta />
+          <Links />
+        </head>
+        <body className="h-full">
+          <main>
+            <NavBar />
+            <div id="content">
+              <Outlet />
+            </div>
+          </main>
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </body>
+      </html>
+    </DarkModeContext.Provider>
   );
 }
 

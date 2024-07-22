@@ -1,6 +1,9 @@
 import { Link, NavLink } from "@remix-run/react";
+import React from "react";
+import { DarkModeContext } from "./darkmodeContext";
 
 export default function NavBar() {
+  const { isDarkMode, setIsDarkMode } = React.useContext(DarkModeContext);
   const sections = [
     { name: "Stories", path: "/" },
     { name: "Ask", path: "/ask" },
