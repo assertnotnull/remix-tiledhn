@@ -19,7 +19,7 @@ export async function loader({ params }: { params: { storyId: number } }) {
     toAsync,
     map((id) => getComment(+id)),
     concurrent(20),
-    toArray
+    toArray,
   );
 
   return defer({ story, comments });
@@ -35,7 +35,7 @@ export async function action({ request }: { request: Request }) {
   const storyId = body.get("storyId");
   if (intent === "loadComment") {
     const cachedComments = (await cacheClient.getItem(
-      `comments:${storyId}`
+      `comments:${storyId}`,
     )) as string;
     if (cachedComments) {
       return json({ comments: cachedComments });
@@ -46,7 +46,7 @@ export async function action({ request }: { request: Request }) {
       toAsync,
       map((id) => getComment(+id)),
       concurrent(20),
-      toArray
+      toArray,
     );
     cacheClient.setItem(`comments:${storyId}`, JSON.stringify(comments), {
       ttl: 10 * 60,
@@ -75,8 +75,8 @@ export default function Index() {
   return (
     <Form method="post">
       <input type="hidden" name="storyId" value={story.id} />
-      <section className="bg-base-200">
-        <div className="px-6 py-10 mx-auto">
+      <section className="bg-base-200 z-0">
+        <div className="px-6 pb-6 pt-20 mb-20 mx-auto">
           <div className="grid grid-cols-1 gap-4">
             <div className="card w-full bg-base-100 shadow-xl">
               <div className="card-body">
