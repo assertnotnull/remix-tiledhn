@@ -5,10 +5,10 @@ import { DarkModeContext } from "./darkmodeContext";
 export default function NavBar() {
   const { isDarkMode, setIsDarkMode } = React.useContext(DarkModeContext);
   const sections = [
-    { name: "Stories", path: "/" },
-    { name: "Ask", path: "/ask" },
-    { name: "Jobs", path: "/jobs" },
-    { name: "Show", path: "/show" },
+    { name: "📖 Stories", path: "/" },
+    { name: "❓ Ask", path: "/ask" },
+    { name: "👨🏻‍💻 Jobs", path: "/jobs" },
+    { name: "📺 Show", path: "/show" },
   ];
 
   return (
@@ -97,7 +97,7 @@ export default function NavBar() {
           </svg>
         </label>
         <Link to="/about" className="btn">
-          About
+          👉🏻 About this project
         </Link>
       </div>
     </div>
