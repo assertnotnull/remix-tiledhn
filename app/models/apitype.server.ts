@@ -1,6 +1,6 @@
 import { pipe } from "@fxts/core";
 import { z } from "zod";
-import formatRelative from "date-fns/formatRelative/index.js";
+import { formatRelative } from "date-fns";
 
 //Zod schemas based on https://github.com/HackerNews/API, updated to actual API responses
 const formatOptions: Intl.DateTimeFormatOptions = {
@@ -30,7 +30,7 @@ const baseSchema = z.object({
     .transform((val) =>
       typeof val === "number"
         ? pipe(val, convertTimeToDate, convertDateToRelative)
-        : val
+        : val,
     ),
 });
 
