@@ -1,17 +1,10 @@
-import { Link, useSearchParams } from "@remix-run/react";
-import classNames from "classnames";
+import { Link } from "@remix-run/react";
 import type { Item } from "~/models/apitype.server";
 
-export function Grid({
-  stories,
-  numberOfPages,
-}: {
-  stories: Item[];
-  numberOfPages: number;
-}) {
+export function Grid({ stories }: { stories: Item[]; numberOfPages: number }) {
   return (
-    <section className="bg-base-200">
-      <div className="px-6 py-10 mx-auto">
+    <section className="bg-base-200 z-0">
+      <div className="px-6 pb-6 pt-20 mb-20 mx-auto">
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
           {stories.map((story) => (
             <div key={story.id} className="card w-full bg-base-100 shadow-xl">
