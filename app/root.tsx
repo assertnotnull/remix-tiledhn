@@ -1,23 +1,20 @@
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
-  Link,
   Links,
   LiveReload,
   Meta,
-  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
-  useNavigation,
   useRouteError,
 } from "@remix-run/react";
 import type { PropsWithChildren } from "react";
+import React, { useEffect } from "react";
+import { DarkModeContext } from "./components/darkmodeContext";
+import NavBar from "./components/nav";
 import appcss from "./styles/app.css";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
-import React from "react";
-import NavBar from "./components/nav";
-import { DarkModeContext } from "./components/darkmodeContext";
 
 export const links: LinksFunction = () => {
   return [
@@ -35,15 +32,19 @@ export const meta: MetaFunction = () => [
 ];
 
 export default function App() {
-  const navigation = useNavigation();
-
-  const sections = [
-    { name: "Stories", path: "/" },
-    { name: "Ask", path: "/ask" },
-    { name: "Jobs", path: "/jobs" },
-    { name: "Show", path: "/show" },
-  ];
   const [isDarkMode, setIsDarkMode] = React.useState(true);
+
+  useEffect(() => {
+    if (global.window) {
+      const darkModeQuery = global.window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      );
+      setIsDarkMode(darkModeQuery.matches);
+      darkModeQuery.addEventListener("change", (event) => {
+        setIsDarkMode(event.matches);
+      });
+    }
+  }, []);
 
   return (
     <DarkModeContext.Provider value={{ isDarkMode, setIsDarkMode }}>
