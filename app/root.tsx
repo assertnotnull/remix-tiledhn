@@ -1,20 +1,19 @@
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
+  isRouteErrorResponse,
   Links,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  isRouteErrorResponse,
   useRouteError,
 } from "@remix-run/react";
 import type { PropsWithChildren } from "react";
-import React, { useEffect } from "react";
-import { DarkModeContext } from "./components/darkmodeContext";
 import NavBar from "./components/nav";
 import appcss from "./styles/app.css";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
+import { ThemeProvider, useTheme } from "./theme";
 
 export const links: LinksFunction = () => {
   return [
@@ -31,45 +30,35 @@ export const meta: MetaFunction = () => [
   },
 ];
 
-export default function App() {
-  const [isDarkMode, setIsDarkMode] = React.useState(true);
-
-  useEffect(() => {
-    if (global.window) {
-      const darkModeQuery = global.window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      );
-      setIsDarkMode(darkModeQuery.matches);
-      darkModeQuery.addEventListener("change", (event) => {
-        setIsDarkMode(event.matches);
-      });
-    }
-  }, []);
+function Root() {
+  const { theme } = useTheme();
 
   return (
-    <DarkModeContext.Provider value={{ isDarkMode, setIsDarkMode }}>
-      <html
-        lang="en"
-        className="h-full"
-        data-theme={isDarkMode ? "night" : "winter"}
-      >
-        <head>
-          <Meta />
-          <Links />
-        </head>
-        <body className="h-full">
-          <main>
-            <NavBar />
-            <div id="content">
-              <Outlet />
-            </div>
-          </main>
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
-        </body>
-      </html>
-    </DarkModeContext.Provider>
+    <html lang="en" className="h-full" data-theme={theme}>
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body className="h-full">
+        <main>
+          <NavBar />
+          <div id="content">
+            <Outlet />
+          </div>
+        </main>
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <Root />
+    </ThemeProvider>
   );
 }
 

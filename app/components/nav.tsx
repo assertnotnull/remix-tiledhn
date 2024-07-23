@@ -1,9 +1,9 @@
 import { Link, NavLink } from "@remix-run/react";
 import React from "react";
-import { DarkModeContext } from "./darkmodeContext";
+import { ThemeContext } from "~/theme";
 
 export default function NavBar() {
-  const { isDarkMode, setIsDarkMode } = React.useContext(DarkModeContext);
+  const { toggleTheme, setTheme } = React.useContext(ThemeContext);
   const sections = [
     { name: "📖 Stories", path: "/" },
     { name: "❓ Ask", path: "/ask" },
@@ -77,7 +77,7 @@ export default function NavBar() {
           <input
             type="checkbox"
             className="theme-controller"
-            onChange={() => setIsDarkMode(!isDarkMode)}
+            onChange={() => setTheme(toggleTheme())}
           />
 
           <svg
