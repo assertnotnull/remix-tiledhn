@@ -5,8 +5,10 @@ import { Suspense } from "react";
 import { Maybe } from "true-myth";
 import Loading from "~/components/loading";
 import Paginate from "~/components/pagination";
-import { getStoryById } from "~/models/api.server";
-import { getCachedPaginatedStoryIds } from "~/models/cached-api.server";
+import {
+  getCachedPaginatedStoryIds,
+  getCachedStoryById,
+} from "~/models/cached-api.server";
 import { Grid } from "../components/grid";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -23,7 +25,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const stories = pipe(
     pageOfStoryIds,
     toAsync,
-    map(getStoryById),
+    map(getCachedStoryById),
     concurrent(10),
     toArray,
   );

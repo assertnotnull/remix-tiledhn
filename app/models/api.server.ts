@@ -63,11 +63,11 @@ export async function paginateStoryIds(key: Section) {
   return splitEvery(20, storyIds);
 }
 
-function splitEvery<T extends Array<string | number>>(
+function splitEvery<T extends Array<number>>(
   sliceLength: number,
   listOrString: T,
 ) {
-  const batches: Array<Array<string | number>> = [];
+  const batches: Array<Array<number>> = [];
   let counter = 0;
   while (counter < listOrString.length) {
     batches.push(listOrString.slice(counter, (counter += sliceLength)));

@@ -18,7 +18,13 @@ export async function getCached<T>(
 }
 
 export function getCachedStoryById(id: number) {
-  return getCached<Item>(`item:${id}`, () => getStoryById(id));
+  return getCached<Item>(`item:${id}`, async () => {
+    const story = await getStoryById(id);
+    cacheClient.setItem(`item:${id}`, JSON.stringify(story), {
+      ttl: 15 * 60,
+    });
+    return story;
+  });
 }
 
 export async function getCachedPaginatedStoryIds(
@@ -47,8 +53,4 @@ export async function getCachedPaginatedStoryIds(
     pageOfStoryIds,
     numberOfPages,
   };
-}
-
-export function cache15Min(key: string, item: Item) {
-  return cacheClient.setItem(key, JSON.stringify(item), { ttl: 15 * 60 });
 }
