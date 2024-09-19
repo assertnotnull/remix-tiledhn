@@ -33,13 +33,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return defer({ stories, numberOfPages });
 }
 
+const pathForLoading = ["/", "/jobs", "/ask", "/show"];
+
 export default function Index() {
   const data = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+  console.log({ location: navigation.location });
 
   return (
     <>
-      {navigation.state === "loading" && <Loading />}
+      {pathForLoading.includes(navigation.location?.pathname ?? "") &&
+        navigation.state === "loading" && <Loading />}
       <Suspense fallback={<Loading />}>
         <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
           {(stories) => (
