@@ -31,7 +31,8 @@ export default function About() {
         <div>
           <h1 className="text-5xl font-bold">Patrice Gauthier</h1>
           <p className="py-6">
-            Software engineer and architect with 13 years of experience.
+            Software engineer and architect with +
+            {new Date().getFullYear() - 2010} years of experience.
             <br />
             #nodejs #react #microservices #terraform #elixir
           </p>
