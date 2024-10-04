@@ -46,9 +46,7 @@ export default function Index() {
         navigation.state === "loading" && <Loading />}
       <Suspense fallback={<Loading />}>
         <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
-          {(stories) => (
-            <Grid stories={stories} numberOfPages={data.numberOfPages} />
-          )}
+          {(stories) => <Grid stories={stories} />}
         </Await>
       </Suspense>
       <Paginate numberOfPages={data.numberOfPages} />
