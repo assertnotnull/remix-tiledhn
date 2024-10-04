@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
 import type { Item } from "~/models/apitype.server";
 
-export function Grid({ stories }: { stories: Item[]; numberOfPages: number }) {
+export function Grid({ stories }: { stories: Item[] }) {
   return (
     <section className="bg-base-200 z-0">
       <div className="px-6 pb-6 pt-20 mb-20 mx-auto">
