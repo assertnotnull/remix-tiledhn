@@ -2,9 +2,6 @@ import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import { createHash } from "crypto";
 import { URL } from "url";
-import reactLazyLoadImage from "react-lazy-load-image-component";
-
-const LazyLoadImage = reactLazyLoadImage.LazyLoadImage;
 
 export function loader() {
   const emailHash = createHash("md5")
@@ -24,8 +21,9 @@ export default function About() {
   return (
     <div className="hero min-h-screen bg-base-200">
       <div className="hero-content flex-col lg:flex-row">
-        <LazyLoadImage
+        <img
           src={data.imageUrl}
+          loading="lazy"
           className="max-w-sm rounded-full shadow-2xl"
         />
         <div>
