@@ -38,7 +38,6 @@ const pathForLoading = ["/", "/jobs", "/ask", "/show"];
 export default function Index() {
   const data = useLoaderData<typeof loader>();
   const navigation = useNavigation();
-  console.log({ location: navigation.location });
 
   return (
     <>
