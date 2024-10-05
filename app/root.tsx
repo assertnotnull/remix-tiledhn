@@ -11,13 +11,13 @@ import {
 } from "@remix-run/react";
 import type { PropsWithChildren } from "react";
 import NavBar from "./components/nav";
-import appcss from "./styles/app.css";
-import tailwindStylesheetUrl from "./styles/tailwind.css";
+import appcss from "./styles/app.css?url";
+import "~/styles/tailwind.css";
 import { ThemeProvider, useTheme } from "./theme";
 
 export const links: LinksFunction = () => {
   return [
-    { rel: "stylesheet", href: tailwindStylesheetUrl },
+    // { rel: "stylesheet", href: tailwindStylesheetUrl },
     { rel: "stylesheet", href: appcss },
   ];
 };
@@ -36,6 +36,7 @@ function Root() {
   return (
     <html lang="en" className="h-full" data-theme={theme}>
       <head>
+        <meta charSet="utf-8" />
         <Meta />
         <Links />
       </head>
@@ -48,7 +49,6 @@ function Root() {
         </main>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
