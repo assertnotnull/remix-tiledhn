@@ -1,12 +1,12 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import "reflect-metadata";
 import { Maybe } from "true-myth";
-import { autoInjectable, inject } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import { KvCache } from "~/redis.server";
 import type { HackerNewsApi, Section } from "./api.server";
 import { Comment, itemSchema, type Item } from "./apitype.server";
 
-@autoInjectable()
+@injectable()
 export class CacheApi {
   constructor(
     @inject("kvcache") private cache: KvCache,
