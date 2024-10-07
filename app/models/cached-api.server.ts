@@ -1,5 +1,4 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
-import "reflect-metadata";
 import { Maybe } from "true-myth";
 import { inject, injectable } from "tsyringe";
 import { KvCache } from "~/redis.server";
