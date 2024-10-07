@@ -8,7 +8,8 @@ import { CacheApi } from "~/models/cached-api.server";
 
 export async function loader({ params }: { params: { storyId: number } }) {
   const api = container.resolve(CacheApi);
-  const { story, comments } = await api.getStoryComments(+params.storyId);
+  const story = await api.getStory(+params.storyId);
+  const comments = await api.getComments(story);
 
   return defer({ story, comments });
 }

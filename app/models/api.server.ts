@@ -1,13 +1,15 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import {
   commentTreeSchema,
+  Item,
   itemSchema,
   storyIdsSchema,
 } from "./apitype.server";
+import { IHackerNewsApi } from "./api.interface";
 
 export type Section = "top" | "job" | "ask" | "show";
 
-export class HackerNewsApi {
+export class HackerNewsApi implements IHackerNewsApi {
   itemPath: string;
   constructor(private root = "https://hacker-news.firebaseio.com/v0") {
     this.itemPath = `${root}/item`;
@@ -32,12 +34,6 @@ export class HackerNewsApi {
     return pipe(this.callAPI(url), storyIdsSchema.parse);
   }
 
-  async getStoryById(id: number) {
-    const item = await this.getItem(id);
-
-    return itemSchema.parse(item);
-  }
-
   async getComment(id: number) {
     const comment = await pipe(
       this.callAPI(`${this.itemPath}/${id}.json`),
@@ -54,9 +50,42 @@ export class HackerNewsApi {
     return comment;
   }
 
-  async paginateStoryIds(key: Section) {
+  async getComments(story: Pick<Item, "id" | "kids">) {
+    return pipe(
+      story.kids,
+      toAsync,
+      map((id) => this.getComment(+id)),
+      concurrent(20),
+      toArray,
+    );
+  }
+
+  async getStory(storyId: number) {
+    const storyData = await this.getItem(storyId);
+    const story = itemSchema.parse(storyData);
+    return story;
+  }
+
+  async getStories(section: Section, pageNumber: number) {
+    const storyIds = await this.getPaginatedStoryIds(section, pageNumber);
+    return pipe(
+      storyIds,
+      toAsync,
+      map((id) => this.getStory(id)),
+      map((item) => itemSchema.parse(item)),
+      concurrent(10),
+      toArray,
+    );
+  }
+
+  async paginateStoryIds(key: Section): Promise<number[][]> {
     const storyIds = await this.getStoryIdsBySection(key);
     return splitEvery(20, storyIds);
+  }
+
+  async getPaginatedStoryIds(section: Section, pageNumber: number) {
+    const pagedIds = await this.paginateStoryIds(section);
+    return pagedIds[pageNumber] ?? [];
   }
 }
 
