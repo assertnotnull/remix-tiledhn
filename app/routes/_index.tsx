@@ -1,14 +1,11 @@
-import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import { Await, useLoaderData, useNavigation } from "@remix-run/react";
 import { LoaderFunctionArgs, defer } from "@remix-run/server-runtime";
 import { Suspense } from "react";
 import { Maybe } from "true-myth";
+import { container } from "tsyringe";
 import Loading from "~/components/loading";
 import Paginate from "~/components/pagination";
-import {
-  getCachedPaginatedStoryIds,
-  getCachedStoryById,
-} from "~/models/cached-api.server";
+import { CacheApi } from "~/models/cached-api.server";
 import { Grid } from "../components/grid";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -18,17 +15,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     (page) => +page - 1,
   );
 
-  const { pageOfStoryIds, numberOfPages } = await getCachedPaginatedStoryIds(
-    "top",
-    pageIndex,
-  );
-  const stories = pipe(
-    pageOfStoryIds,
-    toAsync,
-    map(getCachedStoryById),
-    concurrent(10),
-    toArray,
-  );
+  const api = container.resolve(CacheApi);
+
+  const stories = api.getStories("top", pageIndex);
+  const numberOfPages = await api.getNumberOfPages("top");
 
   return defer({ stories, numberOfPages });
 }

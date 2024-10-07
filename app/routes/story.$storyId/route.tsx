@@ -1,26 +1,14 @@
-import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import { Await, Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { defer, json } from "@remix-run/server-runtime";
 import { Suspense } from "react";
+import { container } from "tsyringe";
 import CommentTree from "~/components/comment-tree";
-import { getComment, getItem } from "~/models/api.server";
-import {
-  commentTreeSchema,
-  itemSchema,
-  type Comment,
-} from "~/models/apitype.server";
-import { cacheClient } from "~/redis.server";
+import { type Comment } from "~/models/apitype.server";
+import { CacheApi } from "~/models/cached-api.server";
 
 export async function loader({ params }: { params: { storyId: number } }) {
-  const storyData = await getItem(params.storyId);
-  const story = itemSchema.parse(storyData);
-  const comments = pipe(
-    story.kids,
-    toAsync,
-    map((id) => getComment(+id)),
-    concurrent(20),
-    toArray,
-  );
+  const api = container.resolve(CacheApi);
+  const { story, comments } = await api.getStoryComments(+params.storyId);
 
   return defer({ story, comments });
 }
@@ -33,26 +21,14 @@ export async function action({ request }: { request: Request }) {
   const body = await request.formData();
   const intent = body.get("intent");
   const storyId = body.get("storyId");
+  const api = container.resolve(CacheApi);
   if (intent === "loadComment") {
-    const cachedComments = (await cacheClient.getItem(
-      `comments:${storyId}`,
-    )) as string;
-    if (cachedComments) {
-      return json({ comments: cachedComments });
-    }
     const kidCommentIds: string = (body.get("kids") as string) || "";
-    const comments = await pipe(
-      kidCommentIds.split(","),
-      toAsync,
-      map((id) => getComment(+id)),
-      concurrent(20),
-      toArray,
-    );
-    cacheClient.setItem(`comments:${storyId}`, JSON.stringify(comments), {
-      ttl: 10 * 60,
-    });
+    const kids = kidCommentIds.split(",").map((v) => +v);
+    const comments = await api.getComments({ id: +storyId!, kids });
+
     return json({
-      comments: comments.map((comment) => commentTreeSchema.parse(comment)),
+      comments,
     });
   }
   return json({ comments: [] });
