@@ -5,13 +5,13 @@ import {
   storyIdsSchema,
 } from "./apitype.server";
 
-const root = "https://hacker-news.firebaseio.com/v0/";
-const itemPath = `${root}item`;
-
 export type Section = "top" | "job" | "ask" | "show";
 
 export class HackerNewsApi {
-  constructor() {}
+  itemPath: string;
+  constructor(private root = "https://hacker-news.firebaseio.com/v0") {
+    this.itemPath = `${root}/item`;
+  }
 
   private async callAPI(url: string): Promise<string | null> {
     try {
@@ -24,11 +24,11 @@ export class HackerNewsApi {
   }
 
   getItem(id: number) {
-    return this.callAPI(`${itemPath}/${id}.json`);
+    return this.callAPI(`${this.itemPath}/${id}.json`);
   }
 
   private async getStoryIdsBySection(section: Section): Promise<number[]> {
-    const url = `${root}/${section}stories.json`;
+    const url = `${this.root}/${section}stories.json`;
     return pipe(this.callAPI(url), storyIdsSchema.parse);
   }
 
@@ -40,7 +40,7 @@ export class HackerNewsApi {
 
   async getComment(id: number) {
     const comment = await pipe(
-      this.callAPI(`${itemPath}/${id}.json`),
+      this.callAPI(`${this.itemPath}/${id}.json`),
       commentTreeSchema.parse,
     );
 
