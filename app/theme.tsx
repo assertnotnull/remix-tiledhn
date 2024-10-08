@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const ThemeChoice = {
   LIGHT: "winter",
@@ -14,8 +14,8 @@ const getPreferredTheme = () =>
     : ThemeChoice.LIGHT;
 
 type ThemeContextType = {
-  theme: Theme | null;
-  setTheme: React.Dispatch<React.SetStateAction<Theme | null>>;
+  theme: Theme | undefined;
+  setTheme: React.Dispatch<React.SetStateAction<Theme | undefined>>;
   toggleTheme: () => Theme;
 };
 
@@ -24,13 +24,11 @@ const ThemeContext = React.createContext<ThemeContextType>(
 );
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = React.useState<Theme | null>(() => {
-    if (typeof window !== "object") {
-      return null;
-    }
+  const [theme, setTheme] = React.useState<Theme | undefined>();
 
-    return getPreferredTheme();
-  });
+  useEffect(() => {
+    setTheme(getPreferredTheme());
+  }, []);
 
   const toggleTheme = () =>
     theme === ThemeChoice.DARK ? ThemeChoice.LIGHT : ThemeChoice.DARK;

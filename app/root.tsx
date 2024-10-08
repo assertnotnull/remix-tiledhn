@@ -2,22 +2,21 @@ import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   isRouteErrorResponse,
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useRouteError,
 } from "@remix-run/react";
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
+import tw from "~/styles/tailwind.css?url";
 import NavBar from "./components/nav";
 import appcss from "./styles/app.css?url";
-import "~/styles/tailwind.css";
 import { ThemeProvider, useTheme } from "./theme";
 
 export const links: LinksFunction = () => {
   return [
-    // { rel: "stylesheet", href: tailwindStylesheetUrl },
+    { rel: "stylesheet", href: tw },
     { rel: "stylesheet", href: appcss },
   ];
 };
