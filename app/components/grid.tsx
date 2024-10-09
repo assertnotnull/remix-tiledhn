@@ -1,7 +1,9 @@
-import { Link } from "@remix-run/react";
+import { Link, useAsyncValue } from "@remix-run/react";
 import type { Item } from "~/models/apitype.server";
 
-export function Grid({ stories }: { stories: Item[] }) {
+export function Grid() {
+  const stories = useAsyncValue() as Item[];
+
   return (
     <section className="bg-base-200 z-0">
       <div className="px-6 pb-6 pt-20 mb-20 mx-auto">
@@ -24,7 +26,7 @@ export function Grid({ stories }: { stories: Item[] }) {
                     Source
                   </a>
                 ) : (
-                  <button className="btn btn-ghost" disabled>
+                  <button className="btn btn-ghost" disabled type="button">
                     No source
                   </button>
                 )}

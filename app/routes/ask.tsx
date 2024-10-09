@@ -17,8 +17,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const api = container.resolve(CacheApi);
 
-  const stories = api.getStories("ask", pageIndex);
   const numberOfPages = await api.getNumberOfPages("ask");
+  const stories = api.getStories("ask", pageIndex);
 
   return defer({ stories, numberOfPages });
 }
@@ -30,7 +30,7 @@ export default function Index() {
     <>
       <Suspense fallback={<Loading />}>
         <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
-          {(stories) => <Grid stories={stories} />}
+          <Grid />
         </Await>
       </Suspense>
       <Paginate numberOfPages={data.numberOfPages} />

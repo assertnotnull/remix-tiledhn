@@ -6,11 +6,14 @@ import {
   storyIdsSchema,
 } from "./apitype.server";
 import { IHackerNewsApi } from "./api.interface";
+import { singleton } from "tsyringe";
 
 export type Section = "top" | "job" | "ask" | "show";
 
+@singleton()
 export class HackerNewsApi implements IHackerNewsApi {
   itemPath: string;
+  paginatedStoryIds = new Map<string, number[][]>();
   constructor(private root = "https://hacker-news.firebaseio.com/v0") {
     this.itemPath = `${root}/item`;
   }
@@ -78,14 +81,26 @@ export class HackerNewsApi implements IHackerNewsApi {
     );
   }
 
-  async paginateStoryIds(key: Section): Promise<number[][]> {
+  async fetchAndSplitStoryIds(key: Section): Promise<number[][]> {
     const storyIds = await this.getStoryIdsBySection(key);
     return splitEvery(20, storyIds);
   }
 
+  async cacheStoryIds(section: Section) {
+    if (!this.paginatedStoryIds.has(section)) {
+      const storyIds = await this.fetchAndSplitStoryIds(section);
+      this.paginatedStoryIds.set(section, storyIds);
+    }
+  }
+
   async getPaginatedStoryIds(section: Section, pageNumber: number) {
-    const pagedIds = await this.paginateStoryIds(section);
-    return pagedIds[pageNumber] ?? [];
+    await this.cacheStoryIds(section);
+    return this.paginatedStoryIds.get(section)![pageNumber]!;
+  }
+
+  async getNumberOfPages(section: Section) {
+    await this.cacheStoryIds(section);
+    return this.paginatedStoryIds.get(section)?.length ?? 0;
   }
 }
 

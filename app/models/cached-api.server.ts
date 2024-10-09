@@ -25,7 +25,7 @@ export class CacheApi implements IHackerNewsApi {
 
   async getPaginatedStoryIds(section: Section, pageNumber: number) {
     return this.cache.getCached(`${section}:${pageNumber}`, async () => {
-      const pagedIds = await this.api.paginateStoryIds(section);
+      const pagedIds = await this.api.fetchAndSplitStoryIds(section);
       pagedIds.forEach((storyIds, i) =>
         this.cache.client.setItem(`${section}:${i}`, JSON.stringify(storyIds), {
           ttl: 15 * 60,
