@@ -1,12 +1,18 @@
-import { Link, useAsyncValue } from "@remix-run/react";
+import { Link, useAsyncValue, useNavigation } from "@remix-run/react";
+import classNames from "classnames";
 import type { Item } from "~/models/apitype.server";
 
 export function Grid() {
   const stories = useAsyncValue() as Item[];
+  const nav = useNavigation();
 
   return (
     <section className="bg-base-200 z-0">
-      <div className="px-6 pb-6 pt-20 mb-20 mx-auto">
+      <div
+        className={classNames("px-6 pb-6 pt-20 mb-20 mx-auto", {
+          "opacity-50": nav.state === "loading",
+        })}
+      >
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
           {stories.map((story) => (
             <div key={story.id} className="card w-full bg-base-100 shadow-xl">
