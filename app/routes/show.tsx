@@ -1,19 +1,11 @@
-import { Await, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { LoaderFunctionArgs, defer } from "@remix-run/server-runtime";
-import { Suspense } from "react";
-import { Maybe } from "true-myth";
 import { container } from "tsyringe";
-import Loading from "~/components/loading";
-import Paginate from "~/components/pagination";
+import Section, { getPageIndex } from "~/components/section";
 import { CacheApi } from "~/models/cached-api.server";
-import { Grid } from "../components/grid";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const pageIndex = Maybe.of(url.searchParams.get("page")).mapOr(
-    0,
-    (page) => +page - 1,
-  );
+  const pageIndex = getPageIndex(request.url);
 
   const api = container.resolve(CacheApi);
 
@@ -24,14 +16,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Index() {
   const data = useLoaderData<typeof loader>();
-  return (
-    <>
-      <Suspense fallback={<Loading />}>
-        <Await resolve={data.stories} errorElement={<div>Failed to load</div>}>
-          <Grid />
-        </Await>
-      </Suspense>
-      <Paginate numberOfPages={data.numberOfPages} />
-    </>
-  );
+
+  return <Section stories={data.stories} numberOfPages={data.numberOfPages} />;
 }
