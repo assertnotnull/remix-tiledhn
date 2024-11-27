@@ -1,4 +1,4 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "react-router";
 import {
   isRouteErrorResponse,
   Links,
@@ -7,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteError,
-} from "@remix-run/react";
+} from "react-router";
 import { type PropsWithChildren } from "react";
 import tw from "~/styles/tailwind.css?url";
 import NavBar from "./components/nav";

@@ -1,5 +1,5 @@
-import { useLoaderData } from "@remix-run/react";
-import { LoaderFunctionArgs, defer } from "@remix-run/server-runtime";
+import { useLoaderData } from "react-router";
+import { LoaderFunctionArgs } from "react-router";
 import { container } from "tsyringe";
 import Section, { getPageIndex } from "~/components/section";
 import { CacheApi } from "~/models/cached-api.server";
@@ -11,7 +11,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const numberOfPages = await api.getNumberOfPages("job");
   const stories = api.getStories("job", pageIndex);
 
-  return defer({ stories, numberOfPages });
+  return { stories, numberOfPages };
 }
 
 export async function action({ request }: { request: Request }) {}

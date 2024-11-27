@@ -1,4 +1,4 @@
-import { useSearchParams } from "@remix-run/react";
+import { useSearchParams } from "react-router";
 import classNames from "classnames";
 
 const Paginate = ({ numberOfPages }: { numberOfPages: number }) => {

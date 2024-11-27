@@ -1,5 +1,4 @@
-import { useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
+import { useLoaderData } from "react-router";
 import { createHash } from "crypto";
 import { URL } from "url";
 
@@ -11,9 +10,9 @@ export function loader() {
 
   const imageUrl = new URL(
     `https://www.gravatar.com/avatar/${emailHash}?s=${size}`,
-  );
+  ).toString();
 
-  return json({ imageUrl });
+  return { imageUrl };
 }
 
 export default function About() {

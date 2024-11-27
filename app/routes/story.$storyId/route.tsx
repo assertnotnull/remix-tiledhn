@@ -1,6 +1,5 @@
-import { Await, Form, useLoaderData, useNavigation } from "@remix-run/react";
-import { defer, json } from "@remix-run/server-runtime";
 import { Suspense } from "react";
+import { Await, Form, useLoaderData, useNavigation } from "react-router";
 import { container } from "tsyringe";
 import CommentTree from "~/components/comment-tree";
 import { type Comment } from "~/models/apitype.server";
@@ -11,7 +10,7 @@ export async function loader({ params }: { params: { storyId: number } }) {
   const story = await api.getStory(+params.storyId);
   const comments = await api.getComments(story);
 
-  return defer({ story, comments });
+  return { story, comments };
 }
 
 type ActionData = {
@@ -28,11 +27,11 @@ export async function action({ request }: { request: Request }) {
     const kids = kidCommentIds.split(",").map((v) => +v);
     const comments = await api.getComments({ id: +storyId!, kids });
 
-    return json({
+    return {
       comments,
-    });
+    };
   }
-  return json({ comments: [] });
+  return { comments: [] };
 }
 
 function LoadingComments() {

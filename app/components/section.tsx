@@ -1,4 +1,4 @@
-import { Await } from "@remix-run/react";
+import { Await } from "react-router";
 import { Suspense } from "react";
 import { Maybe } from "true-myth";
 import { Item } from "~/models/apitype.server";
