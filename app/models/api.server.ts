@@ -1,16 +1,16 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
+import { IHackerNewsApi } from "./api.interface";
 import {
   commentTreeSchema,
   Item,
   itemSchema,
   storyIdsSchema,
 } from "./apitype.server";
-import { IHackerNewsApi } from "./api.interface";
-import { singleton } from "tsyringe";
+import { injectable } from "@needle-di/core";
 
 export type Section = "top" | "job" | "ask" | "show";
 
-@singleton()
+@injectable()
 export class HackerNewsApi implements IHackerNewsApi {
   itemPath: string;
   paginatedStoryIds = new Map<string, number[][]>();

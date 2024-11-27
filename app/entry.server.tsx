@@ -5,20 +5,13 @@
  */
 
 import { PassThrough } from "node:stream";
-import "reflect-metadata";
 import type { AppLoadContext, EntryContext } from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import { container } from "tsyringe";
-import { KvCache } from "./redis.server";
-import { HackerNewsApi } from "./models/api.server";
 
 const ABORT_DELAY = 5_000;
-
-container.register("kvcache", KvCache);
-container.register("api", HackerNewsApi);
 
 export default function handleRequest(
   request: Request,
