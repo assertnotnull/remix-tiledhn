@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import { Await, Form, useLoaderData, useNavigation } from "react-router";
-import { container } from "tsyringe";
 import CommentTree from "~/components/comment-tree";
+import { container } from "~/container.server";
 import { type Comment } from "~/models/apitype.server";
 import { CacheApi } from "~/models/cached-api.server";
 
 export async function loader({ params }: { params: { storyId: number } }) {
-  const api = container.resolve(CacheApi);
+  const api = container.get(CacheApi);
   const story = await api.getStory(+params.storyId);
   const comments = await api.getComments(story);
 
@@ -21,7 +21,7 @@ export async function action({ request }: { request: Request }) {
   const body = await request.formData();
   const intent = body.get("intent");
   const storyId = body.get("storyId");
-  const api = container.resolve(CacheApi);
+  const api = container.get(CacheApi);
   if (intent === "loadComment") {
     const kidCommentIds: string = (body.get("kids") as string) || "";
     const kids = kidCommentIds.split(",").map((v) => +v);

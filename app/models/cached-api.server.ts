@@ -1,16 +1,16 @@
 import { concurrent, map, pipe, toArray, toAsync } from "@fxts/core";
 import { Maybe } from "true-myth";
-import { inject, injectable } from "tsyringe";
 import { KvCache } from "~/redis.server";
-import type { HackerNewsApi, Section } from "./api.server";
+import { HackerNewsApi, Section } from "./api.server";
 import { Comment, itemSchema, type Item } from "./apitype.server";
 import { IHackerNewsApi } from "./api.interface";
+import { inject, injectable } from "@needle-di/core";
 
 @injectable()
 export class CacheApi implements IHackerNewsApi {
   constructor(
-    @inject("kvcache") private cache: KvCache,
-    @inject("api") private api: HackerNewsApi,
+    private cache: KvCache = inject(KvCache),
+    private api: HackerNewsApi = inject(HackerNewsApi),
   ) {}
 
   getStory(id: number) {

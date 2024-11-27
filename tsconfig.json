@@ -2,7 +2,6 @@
   "include": ["**/*.ts", "**/*.tsx", ".react-router/types/**/*"],
   "compilerOptions": {
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["vite/client", "@react-router/node"],
     "rootDirs": [".", "./.react-router/types"],

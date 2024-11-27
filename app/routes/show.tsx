@@ -1,12 +1,12 @@
 import { LoaderFunctionArgs, useLoaderData } from "react-router";
-import { container } from "tsyringe";
 import Section, { getPageIndex } from "~/components/section";
+import { container } from "~/container.server";
 import { CacheApi } from "~/models/cached-api.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const pageIndex = getPageIndex(request.url);
 
-  const api = container.resolve(CacheApi);
+  const api = container.get(CacheApi);
 
   const numberOfPages = await api.getNumberOfPages("show");
   const stories = api.getStories("show", pageIndex);

@@ -1,9 +1,9 @@
+import { injectable } from "@needle-di/core";
 import { createStorage } from "unstorage";
 import redisDriver from "unstorage/drivers/redis";
 import vercelKVDriver from "unstorage/drivers/vercel-kv";
-import { singleton } from "tsyringe";
 
-@singleton()
+@injectable()
 export class KvCache {
   constructor(
     public client: ReturnType<typeof createStorage> = createStorage({
