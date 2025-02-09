@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "@fxts/core": "^1.4.0",
-    "@needle-di/core": "^0.8.4",
+    "@needle-di/core": "^0.10.1",
     "@react-router/fs-routes": "^7.1.5",
     "@react-router/node": "^7.1.5",
     "@react-router/serve": "^7.1.5",
@@ -26,7 +26,7 @@
     "bcryptjs": "^2.4.3",
     "classnames": "^2.5.1",
     "daisyui": "^4.12.23",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "ioredis": "^5.5.0",
     "isbot": "^4.4.0",
     "react": "^18.3.1",
