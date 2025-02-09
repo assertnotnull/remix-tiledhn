@@ -23,9 +23,11 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction = () => [
   {
-    charset: "utf-8",
     title: "Remixed Tiled Hackernews",
-    viewport: "width=device-width,initial-scale=1",
+  },
+  {
+    name: "viewport",
+    content: "width=device-width, initial-scale=1",
   },
 ];
 
