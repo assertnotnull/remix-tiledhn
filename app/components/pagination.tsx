@@ -14,7 +14,7 @@ const Paginate = ({ numberOfPages }: { numberOfPages: number }) => {
 
   return (
     <div className="flex justify-center py-4 gap-1 fixed bottom-0 w-full bg-primary-content">
-      <div className="hidden md:flex">
+      <div className="hidden lg:flex">
         {new Array(numberOfPages).fill(0).map((_, i) => (
           <button
             key={i}
@@ -34,7 +34,7 @@ const Paginate = ({ numberOfPages }: { numberOfPages: number }) => {
           </button>
         ))}
       </div>
-      <div className="md:hidden">
+      <div className="lg:hidden">
         <select
           className="select select-bordered"
           value={currentPage}
