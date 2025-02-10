@@ -7,7 +7,7 @@ export function Grid() {
   const nav = useNavigation();
 
   return (
-    <section className="bg-base-200 z-0">
+    <section className="bg-base-200 z-0 pb-1">
       <div
         className={classNames("px-6 pb-6 pt-20 mb-20 mx-auto", {
           "opacity-50": nav.state === "loading",

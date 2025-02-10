@@ -14,7 +14,7 @@ const Paginate = ({ numberOfPages }: { numberOfPages: number }) => {
 
   return (
     <div className="flex justify-center py-4 gap-1 fixed bottom-0 w-full bg-primary-content">
-      <div className="hidden lg:flex">
+      <div className="hidden lg:flex gap-1">
         {new Array(numberOfPages).fill(0).map((_, i) => (
           <button
             key={i}
