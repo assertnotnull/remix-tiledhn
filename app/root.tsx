@@ -43,10 +43,8 @@ function Root() {
       </head>
       <body className="h-full">
         <main>
-          <NavBar />
-          <div id="content">
-            <Outlet />
-          </div>
+          <NavBar />\
+          <Outlet />
         </main>
         <ScrollRestoration />
         <Scripts />

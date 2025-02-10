@@ -13,7 +13,7 @@ export function Grid() {
           "opacity-50": nav.state === "loading",
         })}
       >
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+        <div className="grid lg:grid-cols-4 sm:grid-cols-1 gap-4">
           {stories.map((story) => (
             <div key={story.id} className="card w-full bg-base-100 shadow-xl">
               <div className="card-body">
