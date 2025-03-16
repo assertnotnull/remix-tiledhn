@@ -1,15 +1,18 @@
-.loading {
-    opacity: 0.25;
-    transition: opacity 200ms;
-    transition-delay: 200ms;
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: corporate --default, synthwave --prefersdark;
 }
 
-a.active {
-  color: #fff;
-  background-color: #337ab7;
-  border-color: #2e6da4;
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-.menu link {
-  display: none
+html,
+body {
+  @apply bg-white dark:bg-gray-950;
+
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
 }

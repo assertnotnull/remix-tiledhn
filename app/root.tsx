@@ -9,27 +9,25 @@ import {
   useRouteError,
 } from "react-router";
 import { type PropsWithChildren } from "react";
-import tw from "~/styles/tailwind.css?url";
 import NavBar from "./components/nav";
-import appcss from "./styles/app.css?url";
+import "./styles/app.css";
 import { ThemeProvider, useTheme } from "./theme";
+import { Route } from "./+types/root";
 
-export const links: LinksFunction = () => {
-  return [
-    { rel: "stylesheet", href: tw },
-    { rel: "stylesheet", href: appcss },
-  ];
-};
 
-export const meta: MetaFunction = () => [
+export const links: Route.LinksFunction = () => [
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
-    title: "Remixed Tiled Hackernews",
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
   },
   {
-    name: "viewport",
-    content: "width=device-width, initial-scale=1",
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
+
 
 function Root() {
   const { theme } = useTheme();
@@ -37,7 +35,8 @@ function Root() {
   return (
     <html lang="en" className="h-full" data-theme={theme}>
       <head>
-        <meta charSet="utf-8" />
+      <meta charSet="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>

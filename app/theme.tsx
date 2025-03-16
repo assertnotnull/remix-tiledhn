@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 
 const ThemeChoice = {
-  LIGHT: "winter",
-  DARK: "night",
+  LIGHT: "corporate",
+  DARK: "synthwave",
 } as const;
 
 type Theme = (typeof ThemeChoice)[keyof typeof ThemeChoice];
