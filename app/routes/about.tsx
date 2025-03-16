@@ -9,7 +9,7 @@ export function loader() {
   const size = 200;
 
   const imageUrl = new URL(
-    `https://www.gravatar.com/avatar/${emailHash}?s=${size}`,
+    `https://www.gravatar.com/avatar/${emailHash}?s=${size}`
   ).toString();
 
   return { imageUrl };
@@ -35,8 +35,8 @@ export default function About() {
           </p>
           <p className="pb-4">
             This plaform is using:{" "}
-            <a className="link" href="//remix.run/" target="blank">
-              Remix
+            <a className="link" href="//reactrouter.com/" target="blank">
+              React Router
             </a>
             ,{" "}
             <a className="link" href="//daisyui.com" target="blank">

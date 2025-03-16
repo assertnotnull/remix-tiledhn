@@ -14,7 +14,6 @@ import "./styles/app.css";
 import { ThemeProvider, useTheme } from "./theme";
 import { Route } from "./+types/root";
 
-
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -28,6 +27,11 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export const meta: MetaFunction = () => [
+  {
+    title: "Tiled Hacker news on React Router",
+  },
+];
 
 function Root() {
   const { theme } = useTheme();
@@ -35,8 +39,8 @@ function Root() {
   return (
     <html lang="en" className="h-full" data-theme={theme}>
       <head>
-      <meta charSet="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
